@@ -2,4 +2,6 @@
 Personal Assistant Agents
 """
 
-__all__ = []
+from .schedule_manager import ScheduleManagerAgent
+
+__all__ = ["ScheduleManagerAgent"]
