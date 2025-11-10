@@ -5,7 +5,7 @@ LangChain + Ollama 기반 Agent 개발 프레임워크
 ## 📦 패키지 구조
 
 ```
-agent_framework/
+src/
 ├── __init__.py              # 패키지 진입점
 ├── agents/                  # Agent 관련 모듈
 │   ├── __init__.py
@@ -32,8 +32,8 @@ agent_framework/
 ### 1. 기본 Agent 생성
 
 ```python
-from agent_framework import create_simple_agent
-from agent_framework.tools import calculator, get_word_length
+from src import create_simple_agent
+from src.tools import calculator, get_word_length
 
 # Agent 생성
 agent = create_simple_agent(
@@ -50,8 +50,8 @@ print(response)  # "100입니다."
 ### 2. 파일 처리 Agent
 
 ```python
-from agent_framework import create_simple_agent
-from agent_framework.tools import read_file, write_file, list_files
+from src import create_simple_agent
+from src.tools import read_file, write_file, list_files
 
 agent = create_simple_agent(
     tools=[read_file, write_file, list_files]
@@ -77,12 +77,12 @@ agent = create_simple_agent(
 
 ## 🛠️ 사용 가능한 Tool
 
-### 기본 Tools (`agent_framework.tools`)
+### 기본 Tools (`src.tools`)
 
 #### calculator
 수식 계산
 ```python
-from agent_framework.tools import calculator
+from src.tools import calculator
 
 agent = create_simple_agent(tools=[calculator])
 agent.chat("123 곱하기 456은?")
@@ -91,7 +91,7 @@ agent.chat("123 곱하기 456은?")
 #### get_word_length
 단어 길이 확인
 ```python
-from agent_framework.tools import get_word_length
+from src.tools import get_word_length
 
 agent = create_simple_agent(tools=[get_word_length])
 agent.chat("'LangChain'은 몇 글자야?")
@@ -100,18 +100,18 @@ agent.chat("'LangChain'은 몇 글자야?")
 #### get_current_time
 현재 시간 조회
 ```python
-from agent_framework.tools import get_current_time
+from src.tools import get_current_time
 
 agent = create_simple_agent(tools=[get_current_time])
 agent.chat("지금 몇 시야?")
 ```
 
-### 파일 Tools (`agent_framework.tools`)
+### 파일 Tools (`src.tools`)
 
 #### read_file
 파일 읽기
 ```python
-from agent_framework.tools import read_file
+from src.tools import read_file
 
 agent = create_simple_agent(tools=[read_file])
 agent.chat("config.py 파일을 읽어줘")
@@ -120,7 +120,7 @@ agent.chat("config.py 파일을 읽어줘")
 #### write_file
 파일 쓰기
 ```python
-from agent_framework.tools import write_file
+from src.tools import write_file
 
 agent = create_simple_agent(tools=[write_file])
 agent.chat("'output.txt'에 'Hello'를 저장해줘")
@@ -129,7 +129,7 @@ agent.chat("'output.txt'에 'Hello'를 저장해줘")
 #### list_files
 파일 목록 조회
 ```python
-from agent_framework.tools import list_files
+from src.tools import list_files
 
 agent = create_simple_agent(tools=[list_files])
 agent.chat("현재 디렉토리의 파일 목록을 보여줘")
@@ -140,7 +140,7 @@ agent.chat("현재 디렉토리의 파일 목록을 보여줘")
 ### 1. BaseAgent 상속
 
 ```python
-from agent_framework.agents.base import BaseAgent
+from src.agents.base import BaseAgent
 from langchain.agents import create_agent
 
 class MyCustomAgent(BaseAgent):
@@ -177,7 +177,7 @@ agent = create_simple_agent(tools=[my_custom_tool])
 ### 3. 여러 Tool 조합
 
 ```python
-from agent_framework.tools import (
+from src.tools import (
     calculator,
     read_file,
     write_file,
@@ -197,12 +197,12 @@ agent.chat("현재 시간을 계산해서 'time.txt'에 저장해줘")
 
 ### 예제 1: 기본 Agent
 ```bash
-python -m agent_framework.examples.01_basic_agent
+python -m src.examples.01_basic_agent
 ```
 
 ### 예제 2: 파일 처리
 ```bash
-python -m agent_framework.examples.02_file_agent
+python -m src.examples.02_file_agent
 ```
 
 ## 🔧 설정
@@ -216,7 +216,7 @@ OLLAMA_MODEL=gpt-oss:20b
 
 ### 코드에서 설정
 ```python
-from agent_framework.utils import get_model_config
+from src.utils import get_model_config
 
 # 모델별 권장 설정 가져오기
 config = get_model_config("gpt-oss:20b")
@@ -285,7 +285,7 @@ system_prompt = """당신은 전문 프로그래머 어시스턴트입니다.
 
 ### UTF-8 인코딩 에러
 ```python
-from agent_framework.utils import clean_text
+from src.utils import clean_text
 
 # 응답 텍스트 정리
 response = agent.chat("질문")
@@ -313,13 +313,13 @@ agent = create_simple_agent(model_name="llama3.2:3b")
 ## 🔄 확장 가이드
 
 ### 새로운 Tool 추가
-1. `agent_framework/tools/` 에 새 파일 생성
+1. `src/tools/` 에 새 파일 생성
 2. `@tool` 데코레이터로 함수 정의
-3. `agent_framework/tools/__init__.py`에 추가
+3. `src/tools/__init__.py`에 추가
 4. 예제 작성
 
 ```python
-# agent_framework/tools/my_tools.py
+# src/tools/my_tools.py
 from langchain_core.tools import tool
 
 @tool
@@ -329,14 +329,14 @@ def search_web(query: str) -> str:
 ```
 
 ```python
-# agent_framework/tools/__init__.py
-from agent_framework.tools.my_tools import search_web
+# src/tools/__init__.py
+from src.tools.my_tools import search_web
 
 __all__ = [..., "search_web"]
 ```
 
 ### 새로운 Agent 타입 추가
-1. `agent_framework/agents/factory.py`에 클래스 추가
+1. `src/agents/factory.py`에 클래스 추가
 2. 팩토리 함수 작성
 3. `__init__.py`에 export 추가
 

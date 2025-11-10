@@ -9,7 +9,7 @@ from typing import Optional
 from langchain.agents import create_agent
 from langchain_core.tools import BaseTool
 
-from agent_framework.agents.base import BaseAgent
+from src.agents.base import BaseAgent
 
 
 class SimpleAgent(BaseAgent):
@@ -77,7 +77,7 @@ def create_simple_agent(
         SimpleAgent 인스턴스
 
     Example:
-        >>> from agent_framework.tools import calculator
+        >>> from src.tools import calculator
         >>> agent = create_simple_agent(tools=[calculator])
         >>> response = agent.chat("2 + 2는?")
     """
@@ -112,7 +112,7 @@ def create_rag_agent(
         RAGAgent 인스턴스
 
     Example:
-        >>> from agent_framework.tools import create_document_search_tool
+        >>> from src.tools import create_document_search_tool
         >>> search_tool = create_document_search_tool("documents/")
         >>> agent = create_rag_agent(tools=[search_tool])
         >>> response = agent.chat("문서에서 설치 방법을 찾아줘")

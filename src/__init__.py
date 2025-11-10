@@ -10,8 +10,8 @@ Agent Framework - LangChain + Ollama 기반 Agent 개발 프레임워크
 
 __version__ = "0.1.0"
 
-from agent_framework.agents.base import BaseAgent
-from agent_framework.agents.factory import create_simple_agent
+from src.agents.base import BaseAgent
+from src.agents.factory import create_simple_agent
 
 __all__ = [
     "BaseAgent",

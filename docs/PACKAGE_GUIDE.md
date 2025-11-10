@@ -4,7 +4,7 @@
 
 ```
 langchain-example/
-├── agent_framework/              # 메인 패키지
+├── src/              # 메인 패키지
 │   ├── __init__.py              # 패키지 진입점
 │   ├── README.md                # 패키지 문서
 │   │
@@ -56,9 +56,9 @@ langchain-example/
 
 ### 3. 명확한 인터페이스
 ```python
-# agent_framework/__init__.py
-from agent_framework.agents.base import BaseAgent
-from agent_framework.agents.factory import create_simple_agent
+# src/__init__.py
+from src.agents.base import BaseAgent
+from src.agents.factory import create_simple_agent
 
 __all__ = ["BaseAgent", "create_simple_agent"]
 ```
@@ -66,7 +66,7 @@ __all__ = ["BaseAgent", "create_simple_agent"]
 ## 🔧 주요 컴포넌트
 
 ### 1. BaseAgent 클래스
-**위치:** `agent_framework/agents/base.py`
+**위치:** `src/agents/base.py`
 
 **역할:**
 - 모든 Agent의 부모 클래스
@@ -75,7 +75,7 @@ __all__ = ["BaseAgent", "create_simple_agent"]
 
 **사용 예:**
 ```python
-from agent_framework.agents.base import BaseAgent
+from src.agents.base import BaseAgent
 
 class MyAgent(BaseAgent):
     def _create_agent(self):
@@ -84,7 +84,7 @@ class MyAgent(BaseAgent):
 ```
 
 ### 2. Factory 함수
-**위치:** `agent_framework/agents/factory.py`
+**위치:** `src/agents/factory.py`
 
 **역할:**
 - Agent 생성을 단순화
@@ -95,7 +95,7 @@ class MyAgent(BaseAgent):
 - `create_rag_agent()` - RAG Agent
 
 ### 3. Tools 모음
-**위치:** `agent_framework/tools/`
+**위치:** `src/tools/`
 
 **제공하는 도구:**
 
@@ -110,7 +110,7 @@ class MyAgent(BaseAgent):
 - `list_files` - 파일 목록
 
 ### 4. 유틸리티
-**위치:** `agent_framework/utils/`
+**위치:** `src/utils/`
 
 **제공하는 기능:**
 - `config.py` - 설정 관리, 모델별 권장 설정
@@ -121,8 +121,8 @@ class MyAgent(BaseAgent):
 ### 방법 1: 패키지로 import
 ```python
 # 프로젝트 루트에서
-from agent_framework import create_simple_agent
-from agent_framework.tools import calculator
+from src import create_simple_agent
+from src.tools import calculator
 
 agent = create_simple_agent(tools=[calculator])
 response = agent.chat("2 + 2는?")
@@ -131,16 +131,16 @@ response = agent.chat("2 + 2는?")
 ### 방법 2: 예제 실행
 ```bash
 # 예제 1 실행
-python -m agent_framework.examples.01_basic_agent
+python -m src.examples.01_basic_agent
 
 # 예제 2 실행
-python -m agent_framework.examples.02_file_agent
+python -m src.examples.02_file_agent
 ```
 
 ### 방법 3: 모듈로 직접 사용
 ```python
-from agent_framework.agents.factory import SimpleAgent
-from agent_framework.tools.basic import calculator
+from src.agents.factory import SimpleAgent
+from src.tools.basic import calculator
 
 agent = SimpleAgent(
     model_name="gpt-oss:20b",
@@ -154,7 +154,7 @@ agent = SimpleAgent(
 
 **1단계: Tool 함수 작성**
 ```python
-# agent_framework/tools/my_new_tools.py
+# src/tools/my_new_tools.py
 from langchain_core.tools import tool
 
 @tool
@@ -165,15 +165,15 @@ def my_tool(input: str) -> str:
 
 **2단계: __init__.py에 추가**
 ```python
-# agent_framework/tools/__init__.py
-from agent_framework.tools.my_new_tools import my_tool
+# src/tools/__init__.py
+from src.tools.my_new_tools import my_tool
 
 __all__ = [..., "my_tool"]
 ```
 
 **3단계: 사용**
 ```python
-from agent_framework.tools import my_tool
+from src.tools import my_tool
 agent = create_simple_agent(tools=[my_tool])
 ```
 
@@ -181,7 +181,7 @@ agent = create_simple_agent(tools=[my_tool])
 
 **1단계: Agent 클래스 작성**
 ```python
-# agent_framework/agents/factory.py
+# src/agents/factory.py
 class MyCustomAgent(BaseAgent):
     def _create_agent(self):
         # 커스텀 로직
@@ -196,8 +196,8 @@ def create_my_agent(...) -> MyCustomAgent:
 
 **3단계: Export**
 ```python
-# agent_framework/__init__.py
-from agent_framework.agents.factory import create_my_agent
+# src/__init__.py
+from src.agents.factory import create_my_agent
 
 __all__ = [..., "create_my_agent"]
 ```
@@ -205,8 +205,8 @@ __all__ = [..., "create_my_agent"]
 ### 새로운 예제 추가
 
 ```python
-# agent_framework/examples/03_my_example.py
-from agent_framework import create_simple_agent
+# src/examples/03_my_example.py
+from src import create_simple_agent
 
 def main():
     agent = create_simple_agent()
@@ -222,20 +222,20 @@ if __name__ == "__main__":
 
 **패키지 진입점:**
 ```python
-# agent_framework/__init__.py
+# src/__init__.py
 """패키지 설명"""
 
 __version__ = "0.1.0"
 
-from agent_framework.agents import BaseAgent
+from src.agents import BaseAgent
 
 __all__ = ["BaseAgent"]
 ```
 
 **서브패키지:**
 ```python
-# agent_framework/tools/__init__.py
-from agent_framework.tools.basic import calculator
+# src/tools/__init__.py
+from src.tools.basic import calculator
 
 __all__ = ["calculator"]
 ```
@@ -244,13 +244,13 @@ __all__ = ["calculator"]
 
 **❌ 나쁜 예:**
 ```python
-from agent_framework.agents.factory import *
+from src.agents.factory import *
 ```
 
 **✅ 좋은 예:**
 ```python
-from agent_framework import create_simple_agent
-from agent_framework.tools import calculator
+from src import create_simple_agent
+from src.tools import calculator
 ```
 
 ### 3. 모듈 구조
@@ -297,7 +297,7 @@ def create_simple_agent() -> SimpleAgent:
 
 ### Import 문제 해결
 
-**문제:** `ModuleNotFoundError: No module named 'agent_framework'`
+**문제:** `ModuleNotFoundError: No module named 'src'`
 
 **해결:**
 ```bash
@@ -379,10 +379,10 @@ file_agent = create_simple_agent(
 ### 1. 패키지 테스트
 ```bash
 # 패키지 import 확인
-python -c "from agent_framework import create_simple_agent; print('OK')"
+python -c "from src import create_simple_agent; print('OK')"
 
 # 예제 실행
-python -m agent_framework.examples.01_basic_agent
+python -m src.examples.01_basic_agent
 ```
 
 ### 2. 개발 모드 설치
