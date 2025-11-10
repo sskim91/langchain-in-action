@@ -4,8 +4,8 @@
 파일 읽기/쓰기 도구를 사용하는 Agent 예제입니다.
 """
 
-from src import create_simple_agent
-from src.tools import list_files, read_file, write_file
+from core.agents import create_simple_agent
+from core.tools import list_files, read_file, write_file
 
 
 def main():

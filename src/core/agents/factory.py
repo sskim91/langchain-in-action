@@ -9,7 +9,7 @@ from typing import Optional
 from langchain.agents import create_agent
 from langchain_core.tools import BaseTool
 
-from src.agents.base import BaseAgent
+from .base import BaseAgent
 
 
 class SimpleAgent(BaseAgent):

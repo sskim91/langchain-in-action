@@ -4,8 +4,8 @@
 간단한 Tool을 가진 Agent를 생성하고 사용하는 예제입니다.
 """
 
-from src import create_simple_agent
-from src.tools import calculator, get_current_time, get_word_length
+from core.agents import create_simple_agent
+from core.tools import calculator, get_current_time, get_word_length
 
 
 def main():
