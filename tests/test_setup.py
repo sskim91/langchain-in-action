@@ -18,7 +18,7 @@ def test_langchain_import():
         assert tool is not None
         assert ChatOllama is not None
     except ImportError as e:
-        raise AssertionError(f"LangChain 라이브러리를 찾을 수 없습니다: {e}")
+        raise AssertionError(f"LangChain 라이브러리를 찾을 수 없습니다: {e}") from e
 
 
 def test_personal_assistant_structure():
