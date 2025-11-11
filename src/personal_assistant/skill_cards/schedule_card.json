@@ -1,0 +1,163 @@
+{
+  "id": "SC_SCHEDULE_001",
+  "version": "1.0.0",
+  "agent_name": "일정 관리 전문가",
+  "agent_type": "ScheduleManagerAgent",
+  "description": "사용자의 일정을 분석하고, 최적의 시간을 찾아 캘린더에 이벤트를 생성합니다.",
+
+  "trigger": {
+    "keywords": [
+      "일정",
+      "회의",
+      "약속",
+      "미팅",
+      "스케줄",
+      "캘린더",
+      "예약",
+      "시간",
+      "날짜"
+    ],
+    "intent": "schedule_management",
+    "similarity_threshold": 0.85,
+    "examples": [
+      "내일 오후 2시에 팀 회의 일정 잡아줘",
+      "다음주 월요일에 1시간짜리 미팅 추가해줘",
+      "오늘 오후에 30분 동안 커피챗 일정 만들어줘"
+    ]
+  },
+
+  "tools": [
+    {
+      "name": "parse_event_info",
+      "required": true,
+      "timeout_ms": 3000,
+      "retry": 1
+    },
+    {
+      "name": "find_free_time",
+      "required": true,
+      "timeout_ms": 5000,
+      "retry": 2
+    },
+    {
+      "name": "create_event",
+      "required": true,
+      "timeout_ms": 3000,
+      "retry": 1
+    },
+    {
+      "name": "get_calendar_events",
+      "required": false,
+      "timeout_ms": 4000,
+      "retry": 1
+    },
+    {
+      "name": "send_notification",
+      "required": false,
+      "timeout_ms": 2000,
+      "retry": 0
+    }
+  ],
+
+  "execution_plan": [
+    {
+      "step": 1,
+      "action": "parse_event_info",
+      "description": "사용자 요청에서 이벤트 정보 추출 (제목, 날짜, 시간, 소요시간)",
+      "input": {
+        "query": "${user_query}",
+        "context": "${conversation_history}"
+      },
+      "output_to": "event_data",
+      "timeout_ms": 3000,
+      "on_error": "fail"
+    },
+    {
+      "step": 2,
+      "action": "get_calendar_events",
+      "description": "해당 날짜의 기존 캘린더 이벤트 조회",
+      "input": {
+        "date": "${event_data.date}",
+        "user_id": "${user_id}"
+      },
+      "output_to": "existing_events",
+      "timeout_ms": 4000,
+      "on_error": "skip"
+    },
+    {
+      "step": 3,
+      "action": "find_free_time",
+      "description": "기존 일정을 고려하여 빈 시간대 찾기",
+      "input": {
+        "date": "${event_data.date}",
+        "duration_minutes": "${event_data.duration}",
+        "existing_events": "${existing_events}",
+        "preferred_time": "${event_data.preferred_time}",
+        "working_hours": {
+          "start": "09:00",
+          "end": "18:00"
+        }
+      },
+      "output_to": "available_slots",
+      "timeout_ms": 5000,
+      "on_error": "fail"
+    },
+    {
+      "step": 4,
+      "action": "create_event",
+      "description": "최적의 시간대에 캘린더 이벤트 생성",
+      "input": {
+        "title": "${event_data.title}",
+        "start_time": "${available_slots.best_slot.start}",
+        "end_time": "${available_slots.best_slot.end}",
+        "description": "${event_data.description}",
+        "attendees": "${event_data.attendees}",
+        "user_id": "${user_id}"
+      },
+      "output_to": "created_event",
+      "timeout_ms": 3000,
+      "on_error": "fail"
+    },
+    {
+      "step": 5,
+      "action": "send_notification",
+      "description": "일정 생성 완료 알림 전송 (선택적)",
+      "input": {
+        "event": "${created_event}",
+        "user_id": "${user_id}",
+        "message": "일정이 성공적으로 생성되었습니다."
+      },
+      "output_to": "notification_result",
+      "timeout_ms": 2000,
+      "on_error": "skip"
+    }
+  ],
+
+  "constraints": {
+    "validation": [
+      "이벤트 제목은 필수입니다",
+      "날짜는 과거일 수 없습니다",
+      "소요 시간은 15분 이상, 8시간 이하여야 합니다",
+      "근무 시간(09:00-18:00) 내에서만 일정을 생성합니다",
+      "기존 일정과 겹치지 않아야 합니다"
+    ],
+    "output_format": "json",
+    "max_response_length": 1000,
+    "language": "ko-KR"
+  },
+
+  "llm_config": {
+    "model": "gpt-oss:20b",
+    "temperature": 0.1,
+    "max_tokens": 500,
+    "system_prompt": "당신은 전문적인 일정 관리 비서입니다. 사용자의 요청을 정확히 이해하고, 최적의 시간대를 찾아 일정을 생성합니다. 항상 친절하고 명확하게 응답하세요."
+  },
+
+  "metadata": {
+    "author": "sskim",
+    "created_at": "2025-11-11",
+    "tags": ["schedule", "calendar", "productivity"],
+    "priority": "high",
+    "dependencies": ["google_calendar", "timezone_utils"]
+  }
+}
