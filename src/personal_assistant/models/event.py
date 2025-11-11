@@ -1,9 +1,20 @@
 """
 Event 데이터 모델
+
+📌 목적:
+- 일정 데이터의 형식을 정의하고 검증
+- 잘못된 형식(예: 시간을 "내일"로 쓰기)을 막음
+
+📝 사용 예시:
+    event = Event(
+        title="팀 회의",
+        start_time="2025-11-15 14:00",
+        duration=60
+    )
 """
 
 from datetime import datetime
-from typing import Optional
+from typing import ClassVar
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -14,8 +25,8 @@ class EventBase(BaseModel):
     title: str = Field(..., min_length=1, max_length=200, description="일정 제목")
     start_time: str = Field(..., description="시작 시간 (YYYY-MM-DD HH:MM)")
     duration: int = Field(60, gt=0, le=1440, description="소요 시간 (분)")
-    location: Optional[str] = Field(None, max_length=200, description="장소")
-    description: Optional[str] = Field(None, max_length=1000, description="상세 설명")
+    location: str | None = Field(None, max_length=200, description="장소")
+    description: str | None = Field(None, max_length=1000, description="상세 설명")
 
     @field_validator("start_time")
     @classmethod
@@ -25,7 +36,9 @@ class EventBase(BaseModel):
             datetime.strptime(v, "%Y-%m-%d %H:%M")
             return v
         except ValueError:
-            raise ValueError("시작 시간은 'YYYY-MM-DD HH:MM' 형식이어야 합니다")
+            raise ValueError(
+                "시작 시간은 'YYYY-MM-DD HH:MM' 형식이어야 합니다"
+            ) from None
 
 
 class EventCreate(EventBase):
@@ -42,7 +55,7 @@ class Event(EventBase):
     created_at: str = Field(..., description="생성 시간")
 
     class Config:
-        json_schema_extra = {
+        json_schema_extra: ClassVar[dict[str, dict[str, str | int]]] = {
             "example": {
                 "id": "EVT001",
                 "title": "팀 회의",

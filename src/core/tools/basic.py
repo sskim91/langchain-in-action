@@ -28,7 +28,7 @@ def calculator(expression: str) -> str:
         result = eval(expression)
         return f"계산 결과: {result}"
     except Exception as e:
-        return f"계산 오류: {str(e)}"
+        return f"계산 오류: {e!s}"
 
 
 @tool

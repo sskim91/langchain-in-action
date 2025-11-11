@@ -1,8 +1,21 @@
 """
-Base Agent 클래스
+Base Agent 클래스 (재사용 가능한 Agent 기본 틀)
+
+📌 목적:
+- 모든 Agent의 기본 틀 제공
+- 공통 기능을 한 곳에 모아서 재사용
+
+🏗️ 제공 기능:
+- LLM 연결 (Ollama)
+- Tool 관리
+- 기본 대화 인터페이스
+
+💡 사용 방식:
+- 이 클래스를 상속받아 새로운 Agent 만들기
+- 예: ScheduleManagerAgent extends BaseAgent
 """
 
-from typing import Any, Optional
+from typing import Any
 
 from langchain_core.tools import BaseTool
 from langchain_ollama import ChatOllama
@@ -20,7 +33,7 @@ class BaseAgent:
         model_name: str = "gpt-oss:20b",
         temperature: float = 0.1,
         system_prompt: str = "You are a helpful assistant. Always respond in Korean.",
-        tools: Optional[list[BaseTool]] = None,
+        tools: list[BaseTool] | None = None,
     ):
         """
         Args:

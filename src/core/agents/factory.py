@@ -1,10 +1,18 @@
 """
 Agent 팩토리 함수들
 
-다양한 유형의 Agent를 쉽게 생성할 수 있는 팩토리 함수 제공
-"""
+📌 목적:
+- Agent를 쉽게 만들어주는 "공장(Factory)"
+- 복잡한 설정 없이 간단하게 Agent 생성
 
-from typing import Optional
+🏭 제공 함수:
+- create_simple_agent(): 기본 Agent 생성
+- create_rag_agent(): 문서 검색 Agent 생성
+
+💡 팩토리 패턴:
+- 객체 생성 로직을 함수로 캡슐화
+- 사용자는 복잡한 내부 구조 몰라도 됨
+"""
 
 from langchain.agents import create_agent
 from langchain_core.tools import BaseTool
@@ -31,8 +39,8 @@ class RAGAgent(BaseAgent):
         self,
         model_name: str = "gpt-oss:20b",
         temperature: float = 0.1,
-        system_prompt: Optional[str] = None,
-        tools: Optional[list[BaseTool]] = None,
+        system_prompt: str | None = None,
+        tools: list[BaseTool] | None = None,
     ):
         # RAG 전용 시스템 프롬프트
         if system_prompt is None:
@@ -61,8 +69,8 @@ Respond in Korean."""
 def create_simple_agent(
     model_name: str = "gpt-oss:20b",
     temperature: float = 0.1,
-    system_prompt: Optional[str] = None,
-    tools: Optional[list[BaseTool]] = None,
+    system_prompt: str | None = None,
+    tools: list[BaseTool] | None = None,
 ) -> SimpleAgent:
     """
     간단한 Agent 생성
@@ -96,8 +104,8 @@ def create_simple_agent(
 def create_rag_agent(
     model_name: str = "gpt-oss:20b",
     temperature: float = 0.1,
-    system_prompt: Optional[str] = None,
-    tools: Optional[list[BaseTool]] = None,
+    system_prompt: str | None = None,
+    tools: list[BaseTool] | None = None,
 ) -> RAGAgent:
     """
     RAG Agent 생성

@@ -26,13 +26,13 @@ def read_file(filepath: str) -> str:
         "# Project Title\\n\\nDescription..."
     """
     try:
-        with open(filepath, "r", encoding="utf-8") as f:
+        with open(filepath, encoding="utf-8") as f:
             content = f.read()
         return f"파일 '{filepath}' 내용:\n\n{content}"
     except FileNotFoundError:
         return f"오류: 파일 '{filepath}'을(를) 찾을 수 없습니다."
     except Exception as e:
-        return f"파일 읽기 오류: {str(e)}"
+        return f"파일 읽기 오류: {e!s}"
 
 
 @tool
@@ -59,7 +59,7 @@ def write_file(filepath: str, content: str) -> str:
             f.write(content)
         return f"파일 '{filepath}'에 저장되었습니다."
     except Exception as e:
-        return f"파일 쓰기 오류: {str(e)}"
+        return f"파일 쓰기 오류: {e!s}"
 
 
 @tool
@@ -96,4 +96,4 @@ def list_files(directory: str = ".") -> str:
         file_list = "\n".join(files)
         return f"디렉토리 '{directory}' 파일 목록:\n\n{file_list}"
     except Exception as e:
-        return f"디렉토리 조회 오류: {str(e)}"
+        return f"디렉토리 조회 오류: {e!s}"

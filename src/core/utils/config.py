@@ -3,7 +3,6 @@
 """
 
 import os
-from typing import Optional
 
 
 def load_config(config_file: str = ".env") -> dict[str, str]:
@@ -19,7 +18,7 @@ def load_config(config_file: str = ".env") -> dict[str, str]:
     config = {}
 
     if os.path.exists(config_file):
-        with open(config_file, "r") as f:
+        with open(config_file) as f:
             for line in f:
                 line = line.strip()
                 if line and not line.startswith("#"):
@@ -41,7 +40,7 @@ def get_default_model() -> str:
     return os.getenv("OLLAMA_MODEL", "gpt-oss:20b")
 
 
-def get_model_config(model_name: Optional[str] = None) -> dict:
+def get_model_config(model_name: str | None = None) -> dict:
     """
     모델별 권장 설정 반환
 

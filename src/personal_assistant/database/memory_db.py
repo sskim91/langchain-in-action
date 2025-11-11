@@ -1,6 +1,21 @@
 """
-In-memory database for development and testing
-나중에 SQLite나 PostgreSQL로 교체 가능
+In-memory Database (메모리 데이터베이스)
+
+📌 목적:
+- 개발/테스트용 간단한 데이터 저장소
+- 실제 DB(SQLite, PostgreSQL) 없이도 동작 가능
+
+💾 저장 방식:
+- 메모리(RAM)에 저장 → 프로그램 종료 시 데이터 사라짐
+- 개발 초기에는 이걸로 충분, 나중에 실제 DB로 교체
+
+📦 저장 데이터:
+- events: 일정 목록
+- tasks: 할일 목록
+- notes: 메모 목록
+
+💡 싱글톤 패턴:
+- db = MemoryDB() → 전체 앱에서 하나의 DB만 사용
 """
 
 from typing import Any

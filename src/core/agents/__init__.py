@@ -9,6 +9,6 @@ from .factory import create_rag_agent, create_simple_agent
 
 __all__ = [
     "BaseAgent",
-    "create_simple_agent",
     "create_rag_agent",
+    "create_simple_agent",
 ]

@@ -1,9 +1,21 @@
 """
 일정 관리 Tools
+
+📌 목적:
+- Agent가 사용할 수 있는 "도구(Tool)" 정의
+- 망치, 드라이버처럼 Agent가 필요할 때 골라 쓰는 기능들
+
+🔧 제공 도구:
+1. create_event: 새로운 일정 생성
+2. list_events: 일정 목록 조회
+3. find_free_time: 비어있는 시간대 찾기
+
+💡 동작 방식:
+- Agent가 사용자 말을 듣고 → 적절한 도구 선택 → 실행
+- 예: "회의 잡아줘" → Agent가 create_event 도구 사용
 """
 
 from datetime import datetime, timedelta
-from typing import Optional
 
 from langchain_core.tools import tool
 
@@ -15,8 +27,8 @@ def create_event(
     title: str,
     start_time: str,
     duration: int = 60,
-    location: Optional[str] = None,
-    description: Optional[str] = None,
+    location: str | None = None,
+    description: str | None = None,
 ) -> dict:
     """
     새로운 일정 생성
@@ -33,9 +45,7 @@ def create_event(
 
     Example:
         >>> event = create_event(
-        ...     title="팀 회의",
-        ...     start_time="2025-11-15 14:00",
-        ...     duration=60
+        ...     title="팀 회의", start_time="2025-11-15 14:00", duration=60
         ... )
         >>> print(event["id"])
         'EVT001'
@@ -46,7 +56,7 @@ def create_event(
     except ValueError as e:
         return {
             "success": False,
-            "error": f"시작 시간 형식이 올바르지 않습니다. 'YYYY-MM-DD HH:MM' 형식으로 입력해주세요. (예: 2025-11-15 14:00)",
+            "error": "시작 시간 형식이 올바르지 않습니다. 'YYYY-MM-DD HH:MM' 형식으로 입력해주세요. (예: 2025-11-15 14:00)",
             "details": str(e),
         }
 
@@ -75,7 +85,7 @@ def create_event(
 
 @tool
 def list_events(
-    date: Optional[str] = None,
+    date: str | None = None,
     limit: int = 10,
 ) -> dict:
     """
@@ -140,7 +150,7 @@ def find_free_time(date: str, duration: int = 60) -> dict:
     except ValueError as e:
         return {
             "date": date,
-            "error": f"날짜 형식이 올바르지 않습니다. 'YYYY-MM-DD' 형식으로 입력해주세요. (예: 2025-11-15)",
+            "error": "날짜 형식이 올바르지 않습니다. 'YYYY-MM-DD' 형식으로 입력해주세요. (예: 2025-11-15)",
             "details": str(e),
             "available_slots": [],
             "count": 0,
