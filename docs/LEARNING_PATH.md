@@ -1,18 +1,44 @@
 # LangChain + Ollama 학습 로드맵
 
-현재 위치: ✅ **기본 Agent 생성 완료**
+현재 위치: ✅ **Step 06: Dynamic Agent 완료**
 
 ---
 
 ## 🎯 학습 단계별 가이드
 
-### Level 1: 기본기 (현재 완료 ✅)
+### Level 1: 기본기 ✅
 
 - [x] Ollama 모델 설치 및 실행
 - [x] LangChain 1.0 설치
 - [x] 기본 Agent 생성 (`create_agent`)
 - [x] Agent 실행 (`invoke`)
 - [x] 에러 처리 (UTF-8 인코딩 이슈)
+
+### Level 1.5: Skill Card 시스템 ✅
+
+- [x] Skill Card 개념 이해
+- [x] JSON 기반 메타데이터 설계
+- [x] Variable Substitution (`${variable}`)
+- [x] Static Execution Plan 구현
+- [x] SkillCardExecutor 구현
+- [x] 실습: `src/examples/07_skill_card_demo.py`
+
+### Level 1.6: Real Tool Integration ✅
+
+- [x] LLM Tools (Structured Output with Pydantic)
+- [x] DB Tools (CRUD operations)
+- [x] Logic Tools (비즈니스 로직)
+- [x] Verbose 디버깅 시스템
+- [x] 실습: `src/examples/08_real_tools_demo.py`
+
+### Level 1.7: Dynamic Agent ✅
+
+- [x] LLM이 Tool을 스스로 선택
+- [x] Static Plan과의 비교 이해
+- [x] 효율성 vs 예측성 트레이드오프
+- [x] Hybrid 접근 방법
+- [x] 실습: `src/examples/09_dynamic_agent.py`
+- [x] 문서: [Static vs Dynamic 비교](static-vs-dynamic.md)
 
 ---
 

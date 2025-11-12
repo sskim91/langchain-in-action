@@ -14,35 +14,72 @@
 
 ---
 
-## 현재 상태
+## 현재 상태: Step 06 완료 ✅
 
 ### ✅ 완료된 것
 
+#### Step 01-03: 기본 환경 구축
 - [x] Ollama 설치 및 모델 다운로드 (`gpt-oss:20b`)
 - [x] LangChain 1.0 환경 구축
 - [x] BaseAgent 클래스 구현
-- [x] 기본 Tool 2개 구현 (basic.py, file_tools.py)
+- [x] 기본 Tool 구현 (basic.py, file_tools.py)
 - [x] 간단한 Agent 실행 예제
+- [x] Skill Card 시스템 구현
+
+#### Step 04: Skill Card Executor (Static Execution Plan)
+- [x] SkillCardExecutor 구현
+- [x] Variable Substitution (`${variable}`)
+- [x] Execution Plan 순차 실행
+- [x] schedule_card.json 작성
+- [x] 실습: `src/examples/07_skill_card_demo.py`
+
+#### Step 05: Real Tool Integration
+- [x] **LLM Tools**: parse_event_info (Structured Output with Pydantic)
+- [x] **DB Tools**: get_calendar_events, create_event, send_notification
+- [x] **Logic Tools**: find_free_time (비즈니스 로직)
+- [x] **Verbose 시스템**: SkillCardExecutor verbose 모드, Tool verbose 파라미터
+- [x] **Memory DB**: 간단한 in-memory 데이터베이스 구현
+- [x] 실습: `src/examples/08_real_tools_demo.py`
+
+#### Step 06: Dynamic Agent
+- [x] ScheduleManagerAgent 구현
+- [x] LLM이 Tool을 상황에 맞게 선택
+- [x] Static vs Dynamic 비교 분석
+- [x] Hybrid 접근 방법 설계
+- [x] 실습: `src/examples/09_dynamic_agent.py`
+- [x] 문서: `docs/static-vs-dynamic.md`
 
 ### 📁 현재 프로젝트 구조
 
 ```
 langchain-in-action/
 ├── src/
-│   ├── agents/
-│   │   ├── base.py           ✅ BaseAgent 클래스
-│   │   └── factory.py        ✅ Agent Factory
-│   ├── tools/
-│   │   ├── basic.py          ✅ 기본 Tool
-│   │   └── file_tools.py     ✅ 파일 Tool
+│   ├── core/
+│   │   └── skill_cards/
+│   │       ├── executor.py         ✅ SkillCardExecutor (Step 04)
+│   │       └── manager.py          ✅ SkillCardManager (Step 04)
+│   ├── personal_assistant/
+│   │   ├── agents/
+│   │   │   └── schedule_manager.py ✅ ScheduleManagerAgent (Step 06)
+│   │   ├── tools/
+│   │   │   └── schedule_tools.py   ✅ Real Tools (Step 05)
+│   │   ├── database/
+│   │   │   └── memory_db.py        ✅ In-memory DB (Step 05)
+│   │   └── skill_cards/
+│   │       └── schedule_card.json  ✅ Skill Card 정의 (Step 04)
 │   ├── examples/
-│   │   ├── 01_basic_agent.py ✅ 기본 예제
-│   │   └── 02_file_agent.py  ✅ 파일 Agent
+│   │   ├── 01-06_*.py              ✅ 기본 예제들
+│   │   ├── 07_skill_card_demo.py   ✅ Step 04 실습
+│   │   ├── 08_real_tools_demo.py   ✅ Step 05 실습
+│   │   └── 09_dynamic_agent.py     ✅ Step 06 실습
 │   └── tests/
 ├── docs/
-│   ├── AGENT_CONCEPTS.md     ✅ Agent 개념 설명
-│   ├── LEARNING_PATH.md      ✅ 학습 로드맵
-│   └── PROJECT_ROADMAP.md    ✅ 프로젝트 계획 (현재 문서)
+│   ├── AGENT_CONCEPTS.md           ✅ Agent 개념 (+ Dynamic Agent)
+│   ├── SKILL_CARD_GUIDE.md         ✅ Skill Card 가이드 (+ Verbose)
+│   ├── LEARNING_PATH.md            ✅ 학습 로드맵 (Step 05, 06 추가)
+│   ├── PROJECT_ROADMAP.md          ✅ 프로젝트 계획 (현재 문서)
+│   ├── static-vs-dynamic.md        ✅ Static vs Dynamic 비교
+│   └── IMPLEMENTATION_SUMMARY.md   ✅ Step 05-06 구현 요약
 └── README.md
 ```
 
@@ -1093,32 +1130,34 @@ curl http://localhost:8000/agents
 
 | Phase | 기간 | 주요 내용 | 상태 |
 |-------|------|----------|------|
-| **Phase 1** | 1주 | ScheduleManager Agent, Tool 구현, Skill Card | 🎯 **현재** |
-| **Phase 2** | 1주 | Multi-Agent, Supervisor, FastAPI | ⏳ 대기 |
-| **Phase 3** | 1주 | VectorDB, Execution Plan, Constraints | ⏳ 대기 |
-| **Phase 4** | 2주 | 캐싱, 로깅, 모니터링, Admin | ⏳ 대기 |
-| **Phase 5** | 1주 | RAG 구현 | ⏳ 대기 |
-| **총** | **6주** | | |
+| **Step 01-03** | 완료 | 기본 환경 구축, BaseAgent, 기본 Tool | ✅ **완료** |
+| **Step 04** | 완료 | Skill Card Executor, Static Execution Plan | ✅ **완료** |
+| **Step 05** | 완료 | Real Tool Integration (LLM/DB/Logic Tools, Verbose) | ✅ **완료** |
+| **Step 06** | 완료 | Dynamic Agent (vs Static 비교) | ✅ **완료** |
+| **Step 07** | 예정 | VectorDB 연동 (Skill Card 검색) | 🎯 **다음** |
+| **Step 08** | 예정 | Multi-Agent System (Todo, Knowledge Agent 추가) | ⏳ 대기 |
+| **Step 09** | 예정 | Supervisor Agent (자동 라우팅) | ⏳ 대기 |
+| **Step 10+** | 예정 | 캐싱, 로깅, 모니터링, Admin | ⏳ 대기 |
 
 ---
 
-## 다음 단계: Phase 1-1 시작! 🚀
+## 다음 단계: Step 07 - VectorDB 연동 🎯
 
-**지금 바로 시작할 것:**
+**현재 위치:** Step 06 완료 → Step 07 대기 중
 
-1. ✅ 프로젝트 구조 생성
-```bash
-mkdir -p src/agents
-mkdir -p src/tools
-mkdir -p skill_cards
-mkdir -p tests
-```
+**Step 07 목표:**
+- VectorDB (FAISS 또는 ChromaDB) 설정
+- Skill Card 임베딩 생성
+- 유사도 기반 Skill Card 검색
+- 키워드 매칭 → 의미 기반 매칭으로 업그레이드
 
-2. ✅ `ScheduleManagerAgent` 구현
-3. ✅ Tool 4개 작성 (create_event, find_free_time, set_reminder, list_events)
-4. ✅ 테스트 실행
+**완료된 기반 작업:**
+1. ✅ Skill Card 시스템 구현 (Step 04)
+2. ✅ Real Tool Integration (Step 05)
+3. ✅ Dynamic Agent 구현 (Step 06)
+4. ✅ Static vs Dynamic 비교 분석
 
-**시작하시겠습니까?** 🔥
+**다음 학습 주제:** RAG (Retrieval-Augmented Generation)
 
 ---
 

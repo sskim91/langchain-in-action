@@ -6,10 +6,11 @@
 2. [왜 Skill Card가 필요한가?](#왜-skill-card가-필요한가)
 3. [Skill Card vs 기존 AI Agent 패턴](#skill-card-vs-기존-ai-agent-패턴)
 4. [Skill Card 구조](#skill-card-구조)
-5. [Skill Card 생명주기](#skill-card-생명주기)
-6. [Agent 개발자가 실제로 해야 할 일](#agent-개발자가-실제로-해야-할-일)
-7. [개발 워크플로우](#개발-워크플로우)
-8. [실전 예제](#실전-예제)
+5. [Verbose 디버깅 시스템](#verbose-디버깅-시스템)
+6. [Skill Card 생명주기](#skill-card-생명주기)
+7. [Agent 개발자가 실제로 해야 할 일](#agent-개발자가-실제로-해야-할-일)
+8. [개발 워크플로우](#개발-워크플로우)
+9. [실전 예제](#실전-예제)
 
 ---
 
@@ -270,6 +271,283 @@ User: 내일 회의 일정 잡아줘
   }
 }
 ```
+
+---
+
+## Verbose 디버깅 시스템
+
+### 개요
+
+Skill Card 실행 시 내부 동작을 상세히 확인할 수 있는 디버깅 시스템입니다.
+
+### 왜 필요한가?
+
+**문제: Agent의 블랙박스 문제**
+```python
+# 무엇이 일어나는지 알 수 없음
+result = executor.execute(user_query="내일 회의 잡아줘")
+# → 성공? 실패? 어떤 Tool 호출? 무슨 데이터 전달?
+```
+
+**해결: Verbose 모드로 투명하게**
+```python
+# 모든 실행 과정 출력
+result = executor.execute(
+    user_query="내일 회의 잡아줘",
+    verbose=True  # ⭐ 핵심
+)
+```
+
+### 사용 방법
+
+#### 1. SkillCardExecutor에서 사용
+
+```python
+from core.skill_cards import SkillCardExecutor, SkillCardManager
+
+# Skill Card 로드
+manager = SkillCardManager()
+card = manager.get("SC_SCHEDULE_001")
+
+# Executor 생성 (verbose=True)
+executor = SkillCardExecutor(card, verbose=True)
+
+# 실행
+result = executor.execute(
+    user_query="내일 오후 2시에 팀 회의",
+    context={"user_id": "user123"}
+)
+```
+
+#### 2. Tool 내부에서 사용
+
+```python
+from langchain_core.tools import tool
+from langchain_ollama import ChatOllama
+from pydantic import BaseModel, Field
+
+class EventInfo(BaseModel):
+    title: str = Field(description="일정 제목")
+    date: str = Field(description="날짜 (YYYY-MM-DD)")
+    time: str = Field(description="시간 (HH:MM)")
+
+@tool
+def parse_event_info(query: str, verbose: bool = False) -> dict:
+    """
+    자연어에서 일정 정보 추출 (LLM 사용)
+
+    Args:
+        query: 사용자 질의
+        verbose: 디버깅 정보 출력 여부
+    """
+    # verbose 모드일 때 LangChain 디버그 활성화
+    if verbose:
+        from langchain_core.globals import set_debug
+        set_debug(True)
+
+    llm = ChatOllama(model="gpt-oss:20b", temperature=0.0)
+    structured_llm = llm.with_structured_output(EventInfo)
+
+    if verbose:
+        print("\n" + "=" * 80)
+        print("🤖 LLM 호출 (LangChain verbose=True)")
+        print("=" * 80)
+
+    try:
+        result: EventInfo = structured_llm.invoke(prompt)
+
+        if verbose:
+            print("\n✅ LLM 응답 (Structured Output):")
+            print(f"  • title: {result.title}")
+            print(f"  • date: {result.date}")
+            print(f"  • time: {result.time}")
+            print("=" * 80 + "\n")
+
+        return result.model_dump()
+
+    except Exception as e:
+        if verbose:
+            print(f"\n❌ LLM 호출 실패: {e}")
+            print("=" * 80 + "\n")
+
+        return {"error": f"일정 정보 추출 실패: {str(e)}"}
+```
+
+### Verbose 출력 예시
+
+#### Step-by-Step 실행 추적
+
+```
+================================================================================
+  🚀 Skill Card Executor 시작
+================================================================================
+📋 Skill Card: SC_SCHEDULE_001 v1.0.0
+📝 설명: 일정 생성/조회/수정 Agent
+👤 질의: "내일 오후 2시에 팀 회의"
+📦 컨텍스트: {'user_id': 'user123'}
+================================================================================
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  📍 Step 1/5: parse_event_info
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔧 실행: parse_event_info(
+  query = "내일 오후 2시에 팀 회의"
+)
+
+================================================================================
+🤖 LLM 호출 (LangChain verbose=True)
+================================================================================
+[LangChain 내부 로그...]
+Invoking: `ChatOllama` with `You are an assistant...`
+
+✅ LLM 응답 (Structured Output):
+  • title: 팀 회의
+  • date: 2025-11-13
+  • time: 14:00
+  • duration: 60분
+================================================================================
+
+✅ 성공!
+💾 저장: variables['event_data'] = {
+  'title': '팀 회의',
+  'date': '2025-11-13',
+  'time': '14:00',
+  'duration': 60
+}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  📍 Step 2/5: get_calendar_events
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔧 실행: get_calendar_events(
+  date = "2025-11-13"  ← ${event_data.date}
+)
+
+✅ 성공!
+💾 저장: variables['existing_events'] = [
+  {'id': 'EVT001', 'title': '기존 회의', 'start_time': '2025-11-13 10:00'}
+]
+
+[... Step 3, 4, 5 계속 ...]
+
+================================================================================
+  ✨ 실행 완료!
+================================================================================
+⏱️  총 소요 시간: 3.24초
+✅ 성공 Step: 5개
+❌ 실패 Step: 0개
+📊 실행 결과:
+  • 일정 ID: EVT002
+  • 제목: 팀 회의
+  • 시작: 2025-11-13 14:00
+  • 알림: 전송 완료
+================================================================================
+```
+
+### 디버깅 레벨
+
+Verbose 모드는 3가지 레벨로 제공:
+
+| 레벨 | 출력 내용 | 사용 시기 |
+|-----|----------|---------|
+| **False** (기본) | 결과만 | 프로덕션 |
+| **True** | Step 실행 + Tool 호출 | 개발/테스트 |
+| **LangChain Debug** | LLM 내부 프롬프트까지 | 디버깅 |
+
+#### LangChain Debug 활성화
+
+```python
+from langchain_core.globals import set_debug
+
+# 전역 설정
+set_debug(True)
+
+# Tool 실행
+result = executor.execute(
+    user_query="내일 회의 잡아줘",
+    verbose=True
+)
+```
+
+**추가 출력 내용:**
+- LLM에게 전달된 실제 프롬프트
+- LLM의 내부 생각 과정 (ReAct)
+- Tool 선택 이유
+- 각 Step의 토큰 사용량
+
+### 실전 활용 예시
+
+#### 예시 1: 개발 중 디버깅
+
+```python
+# 새로운 Tool 개발 중
+executor = SkillCardExecutor(card, verbose=True)
+
+# 실행하면서 각 Step 확인
+result = executor.execute(
+    user_query="테스트 질의",
+    context={}
+)
+
+# verbose 출력을 보며 문제 지점 파악:
+# - 어떤 Step에서 실패?
+# - 어떤 데이터가 전달?
+# - 변수 치환이 제대로 동작?
+```
+
+#### 예시 2: 프로덕션 모니터링
+
+```python
+# 프로덕션에서는 verbose=False
+executor = SkillCardExecutor(card, verbose=False)
+
+# 하지만 에러 발생 시 자동으로 verbose=True로 재실행
+try:
+    result = executor.execute(user_query=query, context=ctx)
+except Exception as e:
+    # 재실행 with verbose
+    logger.error(f"실행 실패, verbose 모드로 재실행: {e}")
+    result = executor.execute(user_query=query, context=ctx, verbose=True)
+    # verbose 로그를 로그 파일에 저장
+```
+
+#### 예시 3: 단위 테스트
+
+```python
+def test_schedule_creation():
+    """일정 생성 테스트 (verbose로 각 Step 검증)"""
+    executor = SkillCardExecutor(card, verbose=True)
+
+    result = executor.execute(
+        user_query="내일 오후 2시에 회의",
+        context={"user_id": "test_user"}
+    )
+
+    # verbose 출력으로 각 Step 성공 확인
+    assert result["success"] is True
+    assert result["event"]["title"] == "회의"
+    assert result["event"]["start_time"] == "2025-11-13 14:00"
+```
+
+### 장점
+
+✅ **투명성**: 블랙박스가 아닌 화이트박스
+✅ **디버깅**: 문제 지점 즉시 파악
+✅ **학습**: Agent 내부 동작 이해
+✅ **테스트**: 각 Step 검증 가능
+✅ **모니터링**: 프로덕션 이슈 추적
+
+### 주의사항
+
+⚠️ **성능**: verbose=True는 실행 속도 느림 (로그 출력 비용)
+⚠️ **보안**: 민감한 데이터가 로그에 노출될 수 있음
+⚠️ **로그 크기**: LLM 프롬프트 전체가 출력되어 용량 큼
+
+**권장 사항:**
+- 개발/테스트: verbose=True
+- 프로덕션: verbose=False (에러 시만 True)
+- 민감 데이터: 로그 마스킹 적용
 
 ---
 

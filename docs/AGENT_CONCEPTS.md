@@ -8,9 +8,10 @@
 
 1. [Agent란 무엇인가?](#agent란-무엇인가)
 2. [Skill Card 개념](#skill-card-개념)
-3. [Multi-Agent 시스템](#multi-agent-시스템)
-4. [Agent vs Java Spring 비교](#agent-vs-java-spring-비교)
-5. [실전 예제: 개인 비서 Agent](#실전-예제-개인-비서-agent)
+3. [Static vs Dynamic Agent](#static-vs-dynamic-agent)
+4. [Multi-Agent 시스템](#multi-agent-시스템)
+5. [Agent vs Java Spring 비교](#agent-vs-java-spring-비교)
+6. [실전 예제: 개인 비서 Agent](#실전-예제-개인-비서-agent)
 
 ---
 
@@ -186,6 +187,165 @@ public class AgentConfig {
 **차이점:**
 - Java: 코드로 정의 → 변경 시 재컴파일/재배포 필요
 - Skill Card: JSON/DB로 정의 → 런타임 변경 가능, Admin 페이지에서 수정
+
+---
+
+## Static vs Dynamic Agent
+
+### 두 가지 Agent 패턴
+
+LangChain Agent를 구축하는 주요 패턴:
+
+| 특징 | Static Execution Plan | Dynamic Agent |
+|------|---------------------|---------------|
+| **Tool 선택** | JSON에 미리 정의 | LLM이 매번 판단 |
+| **실행 순서** | 항상 동일 | 상황에 따라 변경 |
+| **예측 가능성** | 높음 ⭐⭐⭐⭐⭐ | 낮음 ⭐⭐ |
+| **유연성** | 낮음 ⭐⭐ | 높음 ⭐⭐⭐⭐⭐ |
+| **효율성** | 보통 (불필요한 Tool도 실행) | 높음 (필요한 Tool만 실행) |
+| **LLM 비용** | 낮음 (Tool 내부만) | 높음 (매번 판단) |
+| **디버깅** | 쉬움 | 어려움 |
+| **적용 사례** | 금융, 의료 규정 준수 | 챗봇, 개인비서 |
+
+### Static Execution Plan (Step 04-05)
+
+**특징**: Skill Card의 `execution_plan`에 실행 순서를 미리 정의
+
+```json
+{
+  "execution_plan": [
+    {"step": 1, "action": "parse_event_info"},
+    {"step": 2, "action": "get_calendar_events"},
+    {"step": 3, "action": "find_free_time"},
+    {"step": 4, "action": "create_event"},
+    {"step": 5, "action": "send_notification"}
+  ]
+}
+```
+
+**장점:**
+- ✅ 예측 가능한 실행 (항상 같은 순서)
+- ✅ 감사 추적 용이
+- ✅ 규정 준수 (금융/의료)
+- ✅ 디버깅 쉬움
+- ✅ LLM 비용 효율적
+
+**단점:**
+- ⚠️ 불필요한 실행 (조회만 해도 5 Step 모두 실행)
+- ⚠️ 유연성 부족
+- ⚠️ JSON 수정 필요
+
+**사용 사례:**
+- 금융 거래 승인 (AML → KYC → 리스크 평가 → 승인)
+- 의료 진단 프로세스 (문진 → 검사 → 판독 → 처방)
+- 제조 공정 (반복적이고 예측 가능한 워크플로우)
+
+### Dynamic Agent (Step 06)
+
+**특징**: LLM이 상황을 보고 필요한 Tool만 선택
+
+```python
+agent = ScheduleManagerAgent()
+response = agent.chat("내일 회의 잡아줘")
+# LLM이 상황을 보고 Tool 선택
+```
+
+**실행 흐름:**
+```
+사용자 질의
+    ↓
+LLM: "어떤 Tool이 필요한가?" 판단
+    ↓
+Tool 1 선택 → 실행 → 결과 확인
+    ↓
+LLM: "충분한가? 다음은?" 판단
+    ↓
+Tool 2 선택 → 실행 → 결과 확인
+    ↓
+LLM: "충분하다" 판단 → 최종 답변
+```
+
+**장점:**
+- ✅ 효율적 (필요한 Tool만 사용)
+- ✅ 유연함 (다양한 질의 타입 처리)
+- ✅ 대화형 (추가 정보 요청 가능)
+- ✅ 확장성 (새 Tool 추가만으로 기능 확장)
+- ✅ 자연스러움
+
+**단점:**
+- ⚠️ 예측 불가 (실행 경로 미리 알 수 없음)
+- ⚠️ LLM 비용 증가 (매번 판단 필요)
+- ⚠️ 디버깅 어려움
+- ⚠️ 잘못된 선택 가능
+- ⚠️ 규정 준수 어려움
+
+**사용 사례:**
+- 챗봇 (다양한 질의: "날씨", "일정", "검색")
+- 개인비서 (유연한 대응 필요)
+- 고객지원 (상황별 다른 Tool 조합)
+
+### 실제 비교 예시
+
+**시나리오: "내일 회의 잡아줘"**
+
+Static Plan:
+```
+Step 1: parse_event_info ✅ (필요)
+Step 2: get_calendar_events ✅ (필요)
+Step 3: find_free_time ✅ (필요)
+Step 4: create_event ✅ (필요)
+Step 5: send_notification ✅ (필요)
+→ 5개 Tool 모두 실행
+```
+
+Dynamic Agent:
+```
+LLM: "일정 생성이니 create_event만"
+→ create_event ✅
+→ 1개 Tool만 실행 (80% 절감!)
+```
+
+### Hybrid 접근
+
+두 패턴의 장점을 결합:
+
+```
+1. Dynamic Agent로 질의 분류
+   "일정 생성"? "조회"? "수정"?
+
+2. 분류 결과에 따라 Static Plan 선택
+   - 생성 → schedule_creation.json 실행
+   - 조회 → schedule_query.json 실행
+   - 수정 → schedule_update.json 실행
+
+3. Static Plan 실행
+   - 예측 가능한 순서
+   - 규정 준수
+   - 감사 추적
+```
+
+**장점:**
+- ✅ 유연성 (Dynamic) + 예측성 (Static)
+- ✅ 비용 최적화 (1번만 LLM 판단)
+- ✅ 감사 추적 가능
+
+### 선택 가이드
+
+**Static Execution Plan을 선택:**
+- ✅ 워크플로우가 반복적이고 예측 가능
+- ✅ 규정 준수가 중요 (금융, 의료)
+- ✅ 감사 추적이 필수
+- ✅ 비용 최적화가 중요
+- ✅ 실행 순서가 논리적으로 고정
+
+**Dynamic Agent를 선택:**
+- ✅ 질의 타입이 다양
+- ✅ 대화형 서비스 (챗봇)
+- ✅ 유연성이 중요
+- ✅ 빠른 프로토타이핑
+- ✅ 사용자 경험 우선
+
+**참고 문서:** [Static vs Dynamic 상세 비교](./static-vs-dynamic.md)
 
 ---
 
