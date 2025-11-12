@@ -60,14 +60,32 @@ class ExecutionContext:
 class SkillCardExecutor:
     """Skill Card 실행 엔진"""
 
-    def __init__(self, skill_card: SkillCard):
+    def __init__(self, skill_card: SkillCard, verbose: bool = False):
         """
         Args:
             skill_card: 실행할 Skill Card
+            verbose: 상세 로그 출력 여부 (기본값: False)
         """
         self.skill_card = skill_card
-        # 나중에 여기에 실제 Tools를 등록할 예정
+        self.verbose = verbose
+        # Tools 저장소: {tool_name: tool_function}
         self.tools: dict[str, Any] = {}
+
+    def register_tool(self, name: str, tool: Any):
+        """
+        Tool 등록
+
+        Args:
+            name: Tool 이름 (예: "parse_event_info")
+            tool: LangChain @tool 함수
+
+        Example:
+            >>> from personal_assistant.tools.schedule_tools import parse_event_info
+            >>> executor.register_tool("parse_event_info", parse_event_info)
+        """
+        self.tools[name] = tool
+        if self.verbose:
+            print(f"✓ Tool 등록: {name}")
 
     def execute(
         self,
@@ -127,20 +145,33 @@ class SkillCardExecutor:
             ctx: 실행 컨텍스트
         """
         print(f"▶ Step {step.step}: {step.action}")
-        print(f"  📄 {step.description}")
+        if self.verbose:
+            print(f"  📄 {step.description}")
 
         # 1. Input 변수 치환
         resolved_input = self._resolve_variables(step.input, ctx)
-        print(f"  📥 Input: {resolved_input}")
+        if self.verbose:
+            print(f"  📥 Input: {resolved_input}")
 
-        # 2. Action 실행 (지금은 Mock으로 시뮬레이션)
+        # 2. Action 실행
         result = self._execute_action(step.action, resolved_input)
-        print(f"  📤 Output: {result}")
+
+        if self.verbose:
+            print(f"  📤 Output: {result}")
+        else:
+            # 간단한 요약만 출력
+            if isinstance(result, dict):
+                print(f"  ✓ 결과: {len(result)}개 필드")
+            elif isinstance(result, list):
+                print(f"  ✓ 결과: {len(result)}개 항목")
+            else:
+                print("  ✓ 완료")
 
         # 3. 결과를 변수에 저장
         if step.output_to:
             ctx.set(step.output_to, result)
-            print(f"  💾 저장: {step.output_to} = {result}")
+            if self.verbose:
+                print(f"  💾 저장: {step.output_to} = {result}")
 
         # 4. 실행 결과 기록
         ctx.add_step_result(step.step, step.action, result)
@@ -206,8 +237,7 @@ class SkillCardExecutor:
         """
         실제 Action 실행
 
-        지금은 Mock으로 시뮬레이션합니다.
-        나중에 실제 Tools와 연결할 예정입니다.
+        등록된 Tool을 호출하거나, 없으면 Mock으로 시뮬레이션합니다.
 
         Args:
             action: 실행할 액션 이름
@@ -216,7 +246,33 @@ class SkillCardExecutor:
         Returns:
             실행 결과
         """
-        # Mock 데이터 (시뮬레이션)
+        # 1. 등록된 Tool이 있으면 실제 실행
+        if action in self.tools:
+            tool = self.tools[action]
+
+            if self.verbose:
+                print(f"\n  🔧 Tool 호출: {action}")
+                print(f"  📥 Tool Input: {input_data}")
+
+            try:
+                # parse_event_info의 경우 verbose 파라미터 추가
+                if action == "parse_event_info" and self.verbose:
+                    input_data = {**input_data, "verbose": True}
+
+                # LangChain Tool 호출
+                result = tool.invoke(input_data)
+
+                if self.verbose:
+                    print(f"  ✅ Tool 성공: {action}")
+
+                return result
+            except Exception as e:
+                print(f"  ⚠️  Tool 실행 오류: {e}")
+                raise
+
+        # 2. Tool이 없으면 Mock 데이터로 시뮬레이션 (하위 호환성)
+        if self.verbose:
+            print(f"  ⚠️  Tool '{action}'이 등록되지 않았습니다. Mock 데이터 사용")
         mock_results = {
             "parse_event_info": {
                 "title": "팀 회의",
@@ -237,17 +293,4 @@ class SkillCardExecutor:
             },
         }
 
-        # Mock 결과 반환
-        result = mock_results.get(action, {"executed": True})
-
-        return result
-
-    def register_tool(self, name: str, tool: Any):
-        """
-        Tool 등록 (나중에 사용)
-
-        Args:
-            name: Tool 이름
-            tool: Tool 객체
-        """
-        self.tools[name] = tool
+        return mock_results.get(action, {"executed": True})
