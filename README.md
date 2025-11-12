@@ -8,6 +8,7 @@ LangChain과 Ollama를 사용한 개인 비서 Agent 시스템입니다. Skill C
 - [요구사항](#요구사항)
 - [설치](#설치)
 - [프로젝트 구조](#프로젝트-구조)
+- [Contributor Guide](#-contributor-guide)
 - [구현 단계](#구현-단계)
 - [사용법](#사용법)
 - [주요 개념](#주요-개념)
@@ -148,6 +149,12 @@ langchain-in-action/
 ├── uv.lock                           # UV 잠금 파일
 └── README.md                         # 이 파일
 ```
+
+## 🧑‍💻 Contributor Guide
+
+- 새로 합류했다면 `AGENTS.md`의 **Repository Guidelines**를 먼저 읽고 브랜치 전략, 테스트 우선순위, Skill Card 작성 요령을 익혀주세요.
+- 문서에는 `uv` 기반 빌드/테스트 명령, Ruff 포맷 규칙, Skill Card/미들웨어 확장 팁, 그리고 PR 템플릿 기대치가 압축되어 있습니다.
+- PR 설명에는 실행한 명령과 결과를 붙여야 하므로, 가이드의 체크리스트를 따라 증빙을 준비하세요.
 
 ## 🎓 구현 단계
 

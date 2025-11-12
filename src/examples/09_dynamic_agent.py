@@ -21,12 +21,14 @@ def main():
     # DB 초기화
     print("\n0️⃣  DB 초기화...")
     db.clear()
-    db.add_event({
-        "title": "기존 회의",
-        "start_time": "2025-11-13 10:00",
-        "end_time": "2025-11-13 11:00",
-        "duration": 60,
-    })
+    db.add_event(
+        {
+            "title": "기존 회의",
+            "start_time": "2025-11-13 10:00",
+            "end_time": "2025-11-13 11:00",
+            "duration": 60,
+        }
+    )
     print(f"   ✅ 기존 일정 {len(db.get_events())}개 추가됨")
 
     # Dynamic Agent 생성
