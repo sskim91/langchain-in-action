@@ -196,10 +196,16 @@ langchain-in-action/
   - LangChain `set_debug(True)` 통합
   - Tool 호출 추적, 성능 지표
 
-### 🔮 Step 06: Dynamic Agent (예정)
-- LLM이 Tool을 상황에 맞게 선택
-- ReAct 패턴 구현
-- Static Plan → Dynamic Planning
+### ✅ Step 06: Dynamic Agent ⭐ 최신!
+- **Dynamic Tool Selection**: LLM이 상황을 보고 필요한 Tool만 선택
+- **효율성**: 불필요한 Tool 실행 안 함 (비용/시간 절감)
+- **유연성**: 같은 Agent로 다양한 질의 타입 처리
+- **비교**: Static Plan은 항상 5 Step, Dynamic은 필요한 만큼만
+- **실제 예시**:
+  - "일정 생성" → create_event만 사용 (1개 Tool)
+  - "조회만" → list_events만 사용 (1개 Tool)
+  - Static Plan이었다면 둘 다 5개 Tool 실행
+- **Trade-off 분석**: [Static vs Dynamic 비교](docs/static-vs-dynamic.md)
 
 ## 💻 사용법
 
@@ -458,7 +464,6 @@ set_debug(True)
 
 ## 🔮 다음 단계
 
-- [ ] **Step 06**: Dynamic Agent 구현 (LLM이 Tool 선택)
 - [ ] **Step 07**: VectorDB 통합 (RAG 패턴)
 - [ ] **Step 08**: Multi-Agent 시스템
 - [ ] **Step 09**: 프로덕션 배포 (FastAPI + Docker)
