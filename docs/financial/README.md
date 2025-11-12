@@ -20,7 +20,7 @@
 
 **아키텍처:**
 ```
-신한은행 스타일 Skill Card 기반 설계
+섭섭은행 스타일 Skill Card 기반 설계
 - Skill Card로 Agent 행동 정의
 - RDB/API Tool로 구조화 데이터 조회
 - VectorDB는 Skill Card 라우팅용 (문서 검색 없음)
@@ -167,7 +167,7 @@ Agent = {
 }
 ```
 
-### Skill Card 기반 설계 (신한은행 스타일)
+### Skill Card 기반 설계 (섭섭은행 스타일)
 
 ```json
 {
@@ -232,7 +232,7 @@ get_financial_statement("삼성전자")  # FinanceDataReader
 
 ### 관련 프로젝트
 - [Personal Assistant](../personal-assistant/README.md) - Skill Card 개념 참고
-- [신한은행 자산관리 Agent](.reviews/KT) - 실전 아키텍처 참고
+- [섭섭은행 자산관리 Agent](.reviews/KT) - 실전 아키텍처 참고
 
 ---
 
@@ -249,7 +249,7 @@ A:
 
 A:
 - 금융 데이터는 이미 구조화되어 있어 RAG 불필요
-- VectorDB는 Skill Card 라우팅에만 사용 (신한은행 방식)
+- VectorDB는 Skill Card 라우팅에만 사용 (섭섭은행 방식)
 - 실시간 API 조회가 더 정확하고 최신 데이터 보장
 
 **Q: 어떤 LLM을 사용하나요?**

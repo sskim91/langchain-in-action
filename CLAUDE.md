@@ -2,6 +2,8 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+see [AGENTS.md](AGENTS.md)
+
 ## Project Overview
 
 This is a **LangChain + Ollama** project implementing a personal assistant AI system using the **Skill Card Pattern**. The project demonstrates two execution approaches:
@@ -394,3 +396,40 @@ Roadmap in `docs/personal-assistant/roadmap.md`:
 **Step 08-09**: TodoManager and KnowledgeManager agents
 **Step 10**: Supervisor agent for multi-agent routing
 **Step 11+**: FastAPI, caching, logging, monitoring
+
+---
+
+## Git Commit Policy
+
+**IMPORTANT**: Do NOT automatically commit changes. The user will handle all git operations.
+
+### Rules
+
+1. **Never auto-commit**: Claude Code should NEVER run `git commit` or `git push` commands automatically
+2. **Prepare changes only**: Make code changes, but leave staging and committing to the user
+3. **Provide git commands**: When work is complete, provide the git commands for the user to run:
+   ```bash
+   git add <files>
+   git commit -m "message"
+   git push origin main
+   ```
+
+### Why This Policy?
+
+- User maintains full control over git history
+- User can review all changes before committing
+- User can write custom commit messages
+- Prevents unwanted commits to repository
+
+### Example Workflow
+
+```bash
+# ❌ Claude Code should NOT do this
+git add . && git commit -m "..." && git push
+
+# ✅ Claude Code should provide commands like this
+# After completing changes, run:
+git add src/financial/
+git commit -m "Add financial data tools"
+git push origin main
+```
