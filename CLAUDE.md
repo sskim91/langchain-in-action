@@ -6,25 +6,36 @@ see [AGENTS.md](AGENTS.md)
 
 ## Project Overview
 
-This is a **LangChain + Ollama** project implementing a personal assistant AI system using the **Skill Card Pattern**. The project demonstrates two execution approaches:
-- **Static Execution Plan**: Predefined sequential workflow (Step 04-05)
-- **Dynamic Agent**: LLM selects tools contextually (Step 06)
+This is a **Multi-Agent Lab** project built with **LangChain + Ollama**. The project is structured as a learning-focused framework for building production-ready multi-agent systems with multiple business domains.
 
-**Current Status**: Step 06 completed (Dynamic Agent implementation)
+**Architecture**: Domain-driven multi-agent system with hierarchical agent structure
+**Execution Patterns**:
+- **Static Execution Plan**: Predefined sequential workflow using Skill Cards
+- **Dynamic Agent**: LLM selects tools contextually based on user queries
+
+**Current Status**: Multi-Agent Lab structure migration completed. Ready for domain expansion and supervisor implementation.
 
 ## Development Commands
 
 ### Running Examples
 
 ```bash
-# Step 05: Real Tools Demo (LLM + DB + Logic tools with verbose debugging)
-uv run python -m src.examples.08_real_tools_demo
+# Basic demos (learning progression)
+uv run python -m src.examples.01_basic_agent        # Basic Agent
+uv run python -m src.examples.02_file_agent         # File operations
+uv run python -m src.examples.03_schedule_agent     # Schedule manager
+uv run python -m src.examples.04_middleware_demo    # Middleware patterns
 
-# Step 06: Dynamic Agent (LLM selects tools)
-uv run python -m src.examples.09_dynamic_agent
+# Skill Card system
+uv run python -m src.examples.05_skill_card_demo    # Skill Card demo
+uv run python -m src.examples.07_executor_demo      # Executor demo
 
-# Step 04: Skill Card Executor Demo
-uv run python -m src.examples.05_skill_card_demo
+# Advanced integration (most important)
+uv run python -m src.examples.08_real_tools_demo    # LLM + DB + Logic tools (verbose debugging)
+uv run python -m src.examples.09_dynamic_agent      # Dynamic tool selection
+
+# Infrastructure demos
+uv run python -m src.examples.13_elasticsearch_demo # Elasticsearch integration
 
 # Quick test script
 uv run python quick_test.py
@@ -59,6 +70,22 @@ uv run ruff check --fix .
 uv run ruff format .
 ```
 
+### Environment Setup
+
+```bash
+# Install dependencies
+uv sync
+
+# Check Ollama model availability
+ollama list
+
+# Start Ollama server (if not already running)
+ollama serve
+
+# Pull required model
+ollama pull gpt-oss:20b
+```
+
 ## Architecture
 
 ### Core Pattern: Skill Card System
@@ -71,9 +98,9 @@ User Query → SkillCardManager → SkillCardExecutor → Tools → Result
 
 **Key Components:**
 
-1. **SkillCard** (`src/core/skill_cards/schema.py`): Pydantic schema defining agent metadata
-2. **SkillCardManager** (`src/core/skill_cards/manager.py`): Loads JSON files
-3. **SkillCardExecutor** (`src/core/skill_cards/executor.py`): Executes the plan
+1. **SkillCard** (`src/multi_agent_lab/platform/skill_card/schema.py`): Pydantic schema defining agent metadata
+2. **SkillCardManager** (`src/multi_agent_lab/platform/skill_card/manager.py`): Loads JSON files
+3. **SkillCardExecutor** (`src/multi_agent_lab/platform/skill_card/executor.py`): Executes the plan
 
 **Execution Flow:**
 
@@ -191,30 +218,74 @@ Current implementations:
 ## Project Structure
 
 ```
-src/
-├── core/                       # Framework layer
+src/multi_agent_lab/
+├── core/                   # Framework core (Agent base classes, Middleware)
 │   ├── agents/
-│   │   └── base_agent.py      # Base agent class (not actively used)
-│   ├── skill_cards/           # ⭐ Core pattern
-│   │   ├── schema.py          # Pydantic models
-│   │   ├── manager.py         # Load JSON
-│   │   └── executor.py        # Execute plan
-│   └── middleware/            # Middleware system
+│   │   └── base_agent.py
+│   └── middleware/
+│       ├── base.py
+│       ├── pii_detection.py
+│       └── audit_logging.py
 │
-├── personal_assistant/        # Application layer
-│   ├── agents/
-│   │   └── schedule_manager.py  # Dynamic agent (Step 06)
-│   ├── tools/
-│   │   └── schedule_tools.py    # LLM/DB/Logic tools
+├── platform/               # Execution platform
+│   ├── langchain_adapter/
+│   └── skill_card/         # ⭐ Skill Card pattern implementation
+│       ├── schema.py       # Pydantic models
+│       ├── manager.py      # Load JSON
+│       └── executor.py     # Execute plan
+│
+├── domains/                # Business domains (independent agent systems)
+│   ├── personal_assistant/
+│   │   ├── agents/
+│   │   │   └── schedule_manager.py  # Dynamic agent
+│   │   ├── tools/
+│   │   │   └── schedule_tools.py    # LLM/DB/Logic tools
+│   │   ├── storage/
+│   │   │   └── memory_db.py         # In-memory DB
+│   │   └── skill_cards/
+│   │       └── schedule_card.json   # Static plan definition
+│   │
+│   ├── financial/          # Financial domain (expandable)
+│   │   ├── agents/
+│   │   ├── tools/
+│   │   └── storage/
+│   │
+│   └── research/           # Research domain (planned)
+│
+├── infra/                  # Infrastructure (external systems)
+│   ├── llm/
 │   ├── database/
-│   │   └── memory_db.py         # In-memory DB
-│   └── skill_cards/
-│       └── schedule_card.json   # Static plan definition
+│   │   ├── elasticsearch/
+│   │   ├── redis/
+│   │   └── postgres/
+│   └── cache/
 │
-└── examples/                  # Runnable demos
-    ├── 08_real_tools_demo.py  # Step 05: Skill Card + Real Tools
-    └── 09_dynamic_agent.py    # Step 06: Dynamic tool selection
+├── shared/                 # Shared components
+│   ├── types/
+│   ├── utils/
+│   └── tools/              # Generic tools (calculator, get_current_time, etc.)
+│
+├── app/                    # Application composition (planned)
+│   ├── personal_assistant_app.py
+│   └── financial_app.py
+│
+└── interfaces/             # External interfaces (planned)
+    ├── cli.py
+    └── api.py
+
+src/examples/               # Runnable demos
+├── 01_basic_agent.py       # Basic Agent
+├── 02_file_agent.py        # File operations Agent
+├── 03_schedule_agent.py    # Schedule management Agent
+├── 04_middleware_demo.py   # Middleware patterns
+├── 05_skill_card_demo.py   # Skill Card demonstration
+├── 07_executor_demo.py     # Executor demonstration
+├── 08_real_tools_demo.py   # ⭐ Skill Card + Real Tools (primary integration demo)
+├── 09_dynamic_agent.py     # Dynamic tool selection
+└── 13_elasticsearch_demo.py # Elasticsearch integration
 ```
+
+For detailed architecture documentation, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Key Concepts
 
@@ -264,7 +335,7 @@ llm = ChatOllama(
 # No need for sys.path manipulation
 
 def test_example():
-    from core.skill_cards import SkillCardManager
+    from multi_agent_lab.platform.skill_card import SkillCardManager
 
     manager = SkillCardManager()
     card = manager.get("SC_SCHEDULE_001")
@@ -334,7 +405,7 @@ def my_new_tool(param: str, verbose: bool = False) -> dict:
 ### Register in Executor
 
 ```python
-from personal_assistant.tools.my_tools import my_new_tool
+from multi_agent_lab.domains.personal_assistant.tools.my_tools import my_new_tool
 
 executor.register_tool("my_new_tool", my_new_tool)
 ```
@@ -361,15 +432,24 @@ Comprehensive docs in `docs/` organized hierarchically:
 
 ### Import Paths
 
-Always use absolute imports from `src/`:
-```python
-# ✅ Correct
-from core.skill_cards import SkillCardManager
-from personal_assistant.tools.schedule_tools import create_event
+Always use absolute imports from `src/multi_agent_lab/`. The codebase has been migrated from the old flat structure to a domain-driven architecture.
 
-# ❌ Wrong
-from ..core.skill_cards import SkillCardManager
+```python
+# ✅ Correct (current structure)
+from multi_agent_lab.platform.skill_card import SkillCardManager
+from multi_agent_lab.domains.personal_assistant.tools.schedule_tools import create_event
+from multi_agent_lab.infra.database.elasticsearch import ElasticsearchClient
+from multi_agent_lab.core.middleware import PIIDetectionMiddleware
+
+# ❌ Wrong (old flat structure - no longer valid)
+from core.skill_cards import SkillCardManager
+from personal_assistant.tools import create_event
+
+# ❌ Wrong (relative imports)
+from ..platform.skill_card import SkillCardManager
 ```
+
+**Important**: All paths in documentation referring to old structure (like `src/core/skill_cards/`) should be interpreted as `src/multi_agent_lab/platform/skill_card/`.
 
 ### LangChain Versions
 
@@ -382,54 +462,65 @@ This project uses **LangChain 1.0.5** split packages:
 
 ### Database
 
-Currently uses **in-memory database** (`src/personal_assistant/database/memory_db.py`). Data doesn't persist between runs. This is intentional for demo purposes.
+Currently uses **in-memory database** (`src/multi_agent_lab/domains/personal_assistant/storage/memory_db.py`). Data doesn't persist between runs. This is intentional for demo purposes.
+
+For production use, integrate with:
+- **Elasticsearch**: `src/multi_agent_lab/infra/database/elasticsearch/` (already implemented)
+- **Redis**: Planned for caching and session management
+- **PostgreSQL**: Planned for relational data storage
 
 ### Korean Language
 
 All user-facing messages and documentation are in Korean. LLM system prompts include `항상 한국어로 응답하세요.`
 
+## Code Style and Conventions
+
+From AGENTS.md - these are the repository guidelines:
+
+### Module Organization
+- `src/multi_agent_lab/core`: Agent primitives, skill cards (schema, manager, executor), middleware (audit + PII)
+- `src/multi_agent_lab/platform`: Execution platform (LangChain adapter, Skill Card system)
+- `src/multi_agent_lab/domains`: Business domains with runnable skills, tools, and storage
+- `src/examples`: Narrative demos (keep inputs lightweight for fast execution)
+- `tests`: Mirrors module tree structure
+- `docs/` and `logs/`: Design notes and execution traces
+
+### Naming Conventions
+- **Python code**: snake_case for modules, functions, files; PascalCase for classes; UPPER_SNAKE_CASE for constants
+- **Skill Card JSON**: lowerCamelCase for JSON keys (to match existing cards and executor expectations)
+- **File naming**: Numbered examples use format `##_description.py` (e.g., `08_real_tools_demo.py`)
+
+### Testing Strategy
+- Use fixtures from `tests/conftest.py` (add new fixtures only when shared across multiple suites)
+- Name tests: `test_<feature>_<scenario>`
+- For Skill Card or tool changes: pair unit tests with `uv run python -m src.examples.08_real_tools_demo`
+- Capture anomalies in `logs/` directory
+
+### Commit Guidelines
+- Follow conventional commit style: `docs: ...`, `feat: ...`, `fix: ...`
+- Keep subject lines under 72 characters
+- PR descriptions should include: motivation, solution outline, verification commands, and screenshots/JSON diffs for behavior changes
+- Reference issues and flag breaking changes
+
+### Agent & Skill Card Development
+- Extend capabilities via `platform/skill_card/schema.py` or `executor.py` (not inside agents)
+- Register new tools in domain-specific tool files (e.g., `domains/personal_assistant/tools/schedule_tools.py`)
+- Document expected inputs/outputs in the matching Skill Card JSON
+- Middleware is opt-in: subclass `BaseMiddleware` and pass through executor configuration
+
 ## Next Steps
 
-Roadmap in `docs/personal-assistant/roadmap.md`:
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed roadmap.
 
-**Step 07** (Next): VectorDB integration for semantic Skill Card matching
-**Step 08-09**: TodoManager and KnowledgeManager agents
-**Step 10**: Supervisor agent for multi-agent routing
-**Step 11+**: FastAPI, caching, logging, monitoring
+**Immediate Next Steps:**
+1. **Domain Supervisors**: Implement supervisor pattern for each domain
+2. **Master Agent**: Create top-level orchestrator for multi-domain routing
+3. **Message Bus**: Add event-driven communication between agents
+4. **Additional Domains**: Expand financial and research domains
 
----
+**Future Enhancements:**
+- FastAPI interface for REST API
+- Redis caching layer
+- LangSmith integration for debugging
+- Production deployment automation
 
-## Git Commit Policy
-
-**IMPORTANT**: Do NOT automatically commit changes. The user will handle all git operations.
-
-### Rules
-
-1. **Never auto-commit**: Claude Code should NEVER run `git commit` or `git push` commands automatically
-2. **Prepare changes only**: Make code changes, but leave staging and committing to the user
-3. **Provide git commands**: When work is complete, provide the git commands for the user to run:
-   ```bash
-   git add <files>
-   git commit -m "message"
-   git push origin main
-   ```
-
-### Why This Policy?
-
-- User maintains full control over git history
-- User can review all changes before committing
-- User can write custom commit messages
-- Prevents unwanted commits to repository
-
-### Example Workflow
-
-```bash
-# ❌ Claude Code should NOT do this
-git add . && git commit -m "..." && git push
-
-# ✅ Claude Code should provide commands like this
-# After completing changes, run:
-git add src/financial/
-git commit -m "Add financial data tools"
-git push origin main
-```

@@ -9,8 +9,10 @@ Dynamic Agent Demo - LLM이 Tool을 스스로 선택
     uv run python -m src.examples.09_dynamic_agent
 """
 
-from personal_assistant.agents.schedule_manager import ScheduleManagerAgent
-from personal_assistant.database import db
+from multi_agent_lab.domains.personal_assistant.agents.schedule_manager import (
+    ScheduleManagerAgent,
+)
+from multi_agent_lab.domains.personal_assistant.storage import db
 
 
 def main():

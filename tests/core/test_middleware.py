@@ -3,7 +3,10 @@ Middleware 테스트
 """
 
 # conftest.py가 자동으로 sys.path를 설정하므로 제거
-from core.middleware import AuditLoggingMiddleware, PIIDetectionMiddleware
+from multi_agent_lab.core.middleware import (
+    AuditLoggingMiddleware,
+    PIIDetectionMiddleware,
+)
 
 
 def test_pii_phone_masking():

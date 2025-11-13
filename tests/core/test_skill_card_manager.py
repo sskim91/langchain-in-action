@@ -11,8 +11,13 @@ SkillCardManager 테스트
 
 import json
 
-from core.skill_cards import SkillCard, SkillCardManager
-from core.skill_cards.schema import Constraints, ExecutionStep, LLMConfig, Trigger
+from multi_agent_lab.platform.skill_card import SkillCard, SkillCardManager
+from multi_agent_lab.platform.skill_card.schema import (
+    Constraints,
+    ExecutionStep,
+    LLMConfig,
+    Trigger,
+)
 
 
 class TestSkillCardManager:

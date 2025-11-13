@@ -10,7 +10,10 @@ Middleware 데모
 2. Agent + Middleware 통합 테스트
 """
 
-from core.middleware import AuditLoggingMiddleware, PIIDetectionMiddleware
+from multi_agent_lab.core.middleware import (
+    AuditLoggingMiddleware,
+    PIIDetectionMiddleware,
+)
 
 
 def test_middleware_standalone():
@@ -67,8 +70,11 @@ def test_agent_with_middleware():
     print("🤖 Test 2: Agent + Middleware 통합 테스트")
     print("=" * 70)
 
-    from personal_assistant.agents.schedule_manager import ScheduleManagerAgent
-    from personal_assistant.database.memory_db import db
+    from multi_agent_lab.domains.personal_assistant.agents.schedule_manager import (
+        ScheduleManagerAgent,
+    )
+
+    from multi_agent_lab.domains.personal_assistant.storage.memory_db import db
 
     # DB 초기화
     db.clear()

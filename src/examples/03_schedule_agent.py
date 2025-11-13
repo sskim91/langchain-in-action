@@ -2,7 +2,9 @@
 일정 관리 Agent 사용 예제
 """
 
-from personal_assistant.agents.schedule_manager import ScheduleManagerAgent
+from multi_agent_lab.domains.personal_assistant.agents.schedule_manager import (
+    ScheduleManagerAgent,
+)
 
 
 def main():

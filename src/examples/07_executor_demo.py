@@ -12,7 +12,7 @@ Skill Card의 Execution Plan을 실제로 실행해봅니다.
     uv run python -m src.examples.07_executor_demo
 """
 
-from core.skill_cards import SkillCardExecutor, SkillCardManager
+from multi_agent_lab.platform.skill_card import SkillCardExecutor, SkillCardManager
 
 
 def main():

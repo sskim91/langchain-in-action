@@ -14,15 +14,16 @@ Real Tools Demo - 실제 Tool로 동작하는 Executor
     uv run python -m src.examples.08_real_tools_demo
 """
 
-from core.skill_cards import SkillCardExecutor, SkillCardManager
-from personal_assistant.database import db
-from personal_assistant.tools.schedule_tools import (
+from multi_agent_lab.domains.personal_assistant.tools.schedule_tools import (
     create_event,
     find_free_time,
     get_calendar_events,
     parse_event_info,
     send_notification,
 )
+
+from multi_agent_lab.domains.personal_assistant.storage import db
+from multi_agent_lab.platform.skill_card import SkillCardExecutor, SkillCardManager
 
 
 def main():

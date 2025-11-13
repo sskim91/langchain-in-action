@@ -4,8 +4,10 @@ ScheduleManagerAgent 테스트
 
 import pytest
 
-from personal_assistant.agents.schedule_manager import ScheduleManagerAgent
-from personal_assistant.database.memory_db import db
+from multi_agent_lab.domains.personal_assistant.agents.schedule_manager import (
+    ScheduleManagerAgent,
+)
+from multi_agent_lab.domains.personal_assistant.storage.memory_db import db
 
 
 @pytest.fixture(autouse=True)

@@ -22,22 +22,27 @@ def test_langchain_import():
 
 
 def test_personal_assistant_structure():
-    """프로젝트 구조 확인"""
+    """프로젝트 구조 확인 (새 구조)"""
     project_root = Path(__file__).parent.parent
-    personal_assistant = project_root / "src" / "personal_assistant"
+    personal_assistant = (
+        project_root / "src" / "multi_agent_lab" / "domains" / "personal_assistant"
+    )
 
-    assert personal_assistant.exists(), "personal_assistant 모듈이 없습니다"
+    assert personal_assistant.exists(), "personal_assistant 도메인이 없습니다"
     assert (personal_assistant / "agents").exists(), "agents 디렉토리가 없습니다"
     assert (personal_assistant / "tools").exists(), "tools 디렉토리가 없습니다"
-    assert (personal_assistant / "models").exists(), "models 디렉토리가 없습니다"
-    assert (personal_assistant / "database").exists(), "database 디렉토리가 없습니다"
+    assert (personal_assistant / "storage").exists(), "storage 디렉토리가 없습니다"
+    assert (personal_assistant / "skill_cards").exists(), (
+        "skill_cards 디렉토리가 없습니다"
+    )
 
 
 def test_memory_db_import():
     """MemoryDB 임포트 확인"""
-    # PYTHONPATH에 src 추가
-    sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
-    from personal_assistant.database import MemoryDB, db
+    from multi_agent_lab.domains.personal_assistant.storage.memory_db import (
+        MemoryDB,
+        db,
+    )
 
     assert MemoryDB is not None
     assert db is not None
@@ -45,9 +50,7 @@ def test_memory_db_import():
 
 def test_memory_db_basic_operations():
     """MemoryDB 기본 동작 확인"""
-    # PYTHONPATH에 src 추가
-    sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
-    from personal_assistant.database import db
+    from multi_agent_lab.domains.personal_assistant.storage.memory_db import db
 
     # 초기화
     db.clear()

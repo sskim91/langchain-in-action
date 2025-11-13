@@ -11,9 +11,11 @@ def test_imports():
     # PYTHONPATH에 src 추가
     sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
-    from personal_assistant.agents.schedule_manager import ScheduleManagerAgent
-    from personal_assistant.database.memory_db import db
-    from personal_assistant.tools.schedule_tools import (
+    from multi_agent_lab.domains.personal_assistant.agents.schedule_manager import (
+        ScheduleManagerAgent,
+    )
+    from multi_agent_lab.domains.personal_assistant.storage.memory_db import db
+    from multi_agent_lab.domains.personal_assistant.tools.schedule_tools import (
         create_event,
         find_free_time,
         list_events,
@@ -31,7 +33,9 @@ def test_agent_initialization():
     # PYTHONPATH에 src 추가
     sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
-    from personal_assistant.agents.schedule_manager import ScheduleManagerAgent
+    from multi_agent_lab.domains.personal_assistant.agents.schedule_manager import (
+        ScheduleManagerAgent,
+    )
 
     agent = ScheduleManagerAgent()
     assert agent is not None

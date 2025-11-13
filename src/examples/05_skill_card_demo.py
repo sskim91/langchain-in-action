@@ -13,7 +13,7 @@ Skill Card 시스템 데모
 
 import json
 
-from core.skill_cards import SkillCardManager
+from multi_agent_lab.platform.skill_card import SkillCardManager
 
 
 def print_section(title: str):
