@@ -36,6 +36,7 @@ uv run python -m src.examples.09_dynamic_agent      # Dynamic tool selection
 
 # Infrastructure demos
 uv run python -m src.examples.13_elasticsearch_demo # Elasticsearch integration
+uv run python -m src.examples.14_redis_demo         # Redis integration
 
 # Quick test script
 uv run python quick_test.py
@@ -282,7 +283,8 @@ src/examples/               # Runnable demos
 ├── 07_executor_demo.py     # Executor demonstration
 ├── 08_real_tools_demo.py   # ⭐ Skill Card + Real Tools (primary integration demo)
 ├── 09_dynamic_agent.py     # Dynamic tool selection
-└── 13_elasticsearch_demo.py # Elasticsearch integration
+├── 13_elasticsearch_demo.py # Elasticsearch integration
+└── 14_redis_demo.py        # Redis integration
 ```
 
 For detailed architecture documentation, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
@@ -466,7 +468,7 @@ Currently uses **in-memory database** (`src/multi_agent_lab/domains/personal_ass
 
 For production use, integrate with:
 - **Elasticsearch**: `src/multi_agent_lab/infra/database/elasticsearch/` (already implemented)
-- **Redis**: Planned for caching and session management
+- **Redis**: `src/multi_agent_lab/infra/database/redis/` (already implemented - caching and session management)
 - **PostgreSQL**: Planned for relational data storage
 
 ### Korean Language
