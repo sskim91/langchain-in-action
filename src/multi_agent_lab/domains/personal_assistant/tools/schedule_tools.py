@@ -24,7 +24,7 @@ from langchain_core.tools import tool
 from langchain_ollama import ChatOllama
 from pydantic import BaseModel, Field
 
-from personal_assistant.database.memory_db import db
+from multi_agent_lab.domains.personal_assistant.storage.memory_db import db
 
 # ============================================================================
 # Pydantic 모델: LLM Structured Output용

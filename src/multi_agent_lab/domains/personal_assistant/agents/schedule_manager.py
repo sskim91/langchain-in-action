@@ -35,8 +35,8 @@ from langchain_classic.agents import AgentExecutor, create_tool_calling_agent
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_ollama import ChatOllama
 
-from core.middleware import BaseMiddleware
-from personal_assistant.tools.schedule_tools import (
+from multi_agent_lab.core.middleware import BaseMiddleware
+from multi_agent_lab.domains.personal_assistant.tools.schedule_tools import (
     create_event,
     find_free_time,
     list_events,
