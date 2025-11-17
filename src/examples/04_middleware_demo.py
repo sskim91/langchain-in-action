@@ -73,7 +73,6 @@ def test_agent_with_middleware():
     from multi_agent_lab.domains.personal_assistant.agents.schedule_manager import (
         ScheduleManagerAgent,
     )
-
     from multi_agent_lab.domains.personal_assistant.storage.memory_db import db
 
     # DB 초기화
