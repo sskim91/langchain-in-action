@@ -192,8 +192,9 @@ Message Bus를 통한 비동기 이벤트 처리 (예정)
 
 ### Phase 2: 도메인 확장 (진행 중)
 - [x] Multi-Agent Lab 구조 마이그레이션
-- [ ] Domain Supervisor 구현
-- [ ] 도메인별 Agent 추가 (Todo, Knowledge)
+- [x] LangGraph 기반 Supervisor 구현 (PersonalAssistantSupervisor)
+- [x] TodoManagerAgent 구현
+- [ ] 도메인별 Agent 추가 (Knowledge)
 - [ ] Financial 도메인 구현
 
 ### Phase 3: 고급 기능 (예정)

@@ -13,7 +13,7 @@ This is a **Multi-Agent Lab** project built with **LangChain + Ollama**. The pro
 - **Static Execution Plan**: Predefined sequential workflow using Skill Cards
 - **Dynamic Agent**: LLM selects tools contextually based on user queries
 
-**Current Status**: Multi-Agent Lab structure migration completed. Ready for domain expansion and supervisor implementation.
+**Current Status**: Multi-Agent Lab structure migration completed. LangGraph Supervisor pattern implemented with TodoAgent.
 
 ## Development Commands
 
@@ -33,6 +33,7 @@ uv run python -m src.examples.07_executor_demo      # Executor demo
 # Advanced integration (most important)
 uv run python -m src.examples.08_real_tools_demo    # LLM + DB + Logic tools (verbose debugging)
 uv run python -m src.examples.09_dynamic_agent      # Dynamic tool selection
+uv run python -m src.examples.10_langgraph_supervisor  # LangGraph Multi-Agent Supervisor
 
 # Infrastructure demos
 uv run python -m src.examples.13_elasticsearch_demo # Elasticsearch integration

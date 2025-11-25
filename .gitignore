@@ -7,6 +7,7 @@ wheels/
 *.egg-info
 .idea/
 logs
+.serena
 
 # Virtual environments
 .venv

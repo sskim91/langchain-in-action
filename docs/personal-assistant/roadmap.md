@@ -13,7 +13,7 @@
 
 ---
 
-## 📊 현재 상태: Step 06 완료 ✅
+## 📊 현재 상태: Step 07 완료 ✅
 
 ### 완료된 작업
 
@@ -41,6 +41,14 @@
 - [x] Static vs Dynamic 비교 분석
 - [x] 실습: `src/examples/09_dynamic_agent.py`
 
+#### Step 07: LangGraph Supervisor 🆕
+- [x] **LangGraph 의존성 추가**
+- [x] **TodoManagerAgent 구현**: 할일 관리 전문 Agent
+- [x] **todo_tools.py**: add_task, list_tasks, complete_task, delete_task
+- [x] **PersonalAssistantSupervisor**: LangGraph StateGraph 기반 라우팅
+- [x] **테스트 작성**: 32개 테스트 통과
+- [x] 실습: `src/examples/10_langgraph_supervisor.py`
+
 ---
 
 ## 🗺️ 전체 로드맵
@@ -51,20 +59,19 @@
 | **04** | Skill Card Executor | ✅ 완료 |
 | **05** | Real Tool Integration | ✅ 완료 |
 | **06** | Dynamic Agent | ✅ 완료 |
-| **07** | VectorDB 연동 | 🎯 다음 |
-| **08** | TodoManager Agent | ⏳ 대기 |
+| **07** | LangGraph Supervisor | ✅ 완료 |
+| **08** | VectorDB 연동 | 🎯 다음 |
 | **09** | KnowledgeManager Agent | ⏳ 대기 |
-| **10** | Supervisor Agent | ⏳ 대기 |
-| **11** | FastAPI 통합 | ⏳ 대기 |
-| **12+** | 캐싱, 로깅, 모니터링 | ⏳ 대기 |
+| **10** | FastAPI 통합 | ⏳ 대기 |
+| **11+** | 캐싱, 로깅, 모니터링 | ⏳ 대기 |
 
 ---
 
-## 🎯 Step 07: VectorDB 연동 (다음 단계)
+## 🎯 Step 08: VectorDB 연동 (다음 단계)
 
 ### 목표
 
-Skill Card 검색을 키워드 매칭에서 의미 기반 매칭으로 업그레이드
+Supervisor의 라우팅을 키워드 매칭에서 의미 기반 매칭으로 업그레이드
 
 ### 구현 내용
 
@@ -72,34 +79,33 @@ Skill Card 검색을 키워드 매칭에서 의미 기반 매칭으로 업그레
    - FAISS 또는 ChromaDB 선택
    - Ollama Embeddings 설정
 
-2. **Skill Card 임베딩**
-   - Skill Card의 description + keywords 임베딩
+2. **Agent 설명 임베딩**
+   - 각 Agent의 description 임베딩
    - VectorDB에 저장
 
-3. **의미 기반 검색**
+3. **의미 기반 라우팅**
    - 사용자 질의 임베딩
-   - 유사도 계산하여 Skill Card 선택
+   - 유사도 계산하여 Agent 선택
 
 4. **Supervisor 통합**
-   - 키워드 매칭 → VectorDB 검색으로 대체
+   - LLM 기반 라우팅 → VectorDB 기반으로 대체 (옵션)
 
 ### 예상 효과
 
 ```python
-# Before (키워드 매칭)
-if "일정" in query or "회의" in query:
-    return schedule_card
+# Before (LLM 기반 라우팅)
+response = llm.invoke("일정? 할일? 분류해줘")
 
 # After (의미 기반)
 query_embedding = embeddings.embed_query("내일 팀 미팅")
-similar_cards = vectordb.similarity_search(query_embedding, k=1)
-return similar_cards[0]
+similar_agents = vectordb.similarity_search(query_embedding, k=1)
+return similar_agents[0]  # → schedule_agent
 ```
 
 **장점:**
+- ✅ 더 빠른 라우팅 (LLM 호출 없이)
 - ✅ 유연한 질의 처리 ("미팅" → "일정" 매칭)
-- ✅ 동의어/유사어 자동 처리
-- ✅ Skill Card 추가 시 자동 반영
+- ✅ Agent 추가 시 자동 반영
 
 ---
 
@@ -107,25 +113,31 @@ return similar_cards[0]
 
 ```
 langchain-in-action/
-├── src/
-│   ├── core/
-│   │   └── skill_cards/
+├── src/multi_agent_lab/
+│   ├── platform/
+│   │   └── skill_card/
 │   │       ├── executor.py          # SkillCardExecutor
 │   │       └── manager.py           # SkillCardManager
-│   ├── personal_assistant/
-│   │   ├── agents/
-│   │   │   └── schedule_manager.py  # ScheduleManagerAgent
-│   │   ├── tools/
-│   │   │   └── schedule_tools.py    # LLM/DB/Logic Tools
-│   │   ├── database/
-│   │   │   └── memory_db.py         # In-memory DB
-│   │   └── skill_cards/
-│   │       └── schedule_card.json   # Skill Card 정의
-│   ├── examples/
-│   │   ├── 07_skill_card_demo.py    # Step 04
-│   │   ├── 08_real_tools_demo.py    # Step 05
-│   │   └── 09_dynamic_agent.py      # Step 06
-│   └── tests/
+│   ├── domains/
+│   │   └── personal_assistant/
+│   │       ├── agents/
+│   │       │   ├── schedule_manager.py  # ScheduleManagerAgent
+│   │       │   ├── todo_manager.py      # TodoManagerAgent 🆕
+│   │       │   └── supervisor.py        # PersonalAssistantSupervisor 🆕
+│   │       ├── tools/
+│   │       │   ├── schedule_tools.py    # LLM/DB/Logic Tools
+│   │       │   └── todo_tools.py        # Todo Tools 🆕
+│   │       └── storage/
+│   │           └── memory_db.py         # In-memory DB
+├── src/examples/
+│   ├── 07_skill_card_demo.py        # Step 04
+│   ├── 08_real_tools_demo.py        # Step 05
+│   ├── 09_dynamic_agent.py          # Step 06
+│   └── 10_langgraph_supervisor.py   # Step 07 🆕
+├── tests/
+│   └── personal_assistant/
+│       ├── test_todo_tools.py       # 🆕
+│       └── test_supervisor.py       # 🆕
 └── docs/
     └── personal-assistant/
         ├── concepts.md
@@ -133,6 +145,7 @@ langchain-in-action/
         ├── patterns.md
         ├── roadmap.md (현재 문서)
         └── step-by-step/
+            └── step-07-langgraph-supervisor.md  # 🆕
 ```
 
 ---
@@ -263,13 +276,12 @@ print(response)
 - [x] Step 04: Skill Card Executor
 - [x] Step 05: Real Tool Integration
 - [x] Step 06: Dynamic Agent
+- [x] Step 07: LangGraph Supervisor
 
 **다음 Step:**
-- [ ] Step 07: VectorDB 연동
-- [ ] Step 08: TodoManager Agent
+- [ ] Step 08: VectorDB 연동
 - [ ] Step 09: KnowledgeManager Agent
-- [ ] Step 10: Supervisor Agent
-- [ ] Step 11: FastAPI 통합
+- [ ] Step 10: FastAPI 통합
 
 ---
 
